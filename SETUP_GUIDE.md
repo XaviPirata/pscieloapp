@@ -1,7 +1,7 @@
 # PsCielo - Setup Guide
 
 > **Última actualización:** 9 de Abril 2026
-> **Etapa actual:** FASE 1 - Estructura Base Completada
+> **Etapa actual:** FASE 2A + 2B Completadas - Endpoints CRUD + Auth JWT
 
 ---
 
@@ -448,19 +448,23 @@ jobs:
 - [x] .env.example documentado
 - [x] Este SETUP_GUIDE.md
 
-### FASE 2A (Próximo)
-- [ ] Schemas Pydantic para cada entidad
-- [ ] Endpoints CRUD para profesionales
-- [ ] Endpoints CRUD para pacientes
-- [ ] Endpoints CRUD para sesiones
-- [ ] Endpoints CRUD para consultorios
-- [ ] Swagger docs funcional
+### FASE 2A ✅
+- [x] Schemas Pydantic para cada entidad (user, professional, patient, session, room, commission, shared)
+- [x] Endpoints CRUD para profesionales
+- [x] Endpoints CRUD para pacientes (+ historial clínico)
+- [x] Endpoints CRUD para sesiones (+ asistencia)
+- [x] Endpoints CRUD para consultorios (+ alquileres)
+- [x] Endpoints para comisiones (cálculo + pago)
+- [x] Swagger docs funcional (auto-generado en /docs)
+- [x] Servicio de auditoría (audit_log inmutable)
 
-### FASE 2B
-- [ ] Autenticación JWT
-- [ ] Validación de tokens
-- [ ] RBAC decorators
-- [ ] Refresh token flow
+### FASE 2B ✅
+- [x] Autenticación JWT (access + refresh tokens)
+- [x] Validación de tokens (middleware auth.py)
+- [x] RBAC decorators (require_admin, require_professional, etc.)
+- [x] Refresh token flow
+- [x] Seed superadmin endpoint (para BD vacía)
+- [x] Password hashing con bcrypt
 
 ### FASE 2C
 - [ ] Gmail API setup y integración
@@ -552,7 +556,7 @@ npm run lint:fix
 
 ### 📊 Estado del Proyecto
 - **Etapa:** Pre-Desarrollo (FASE 1 ✅)
-- **Próximo:** FASE 2A (Endpoints)
+- **Próximo:** FASE 2C (Integraciones) o FASE 3 (Frontend)
 - **Duración estimada:** 4 semanas para MVP completo
 - **Stack:** FastAPI, Next.js, PostgreSQL, Redis, Celery
 

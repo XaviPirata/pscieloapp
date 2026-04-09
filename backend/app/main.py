@@ -62,11 +62,15 @@ async def api_status():
     }
 
 
-# TODO: Import and include routers
-# from app.api import auth, professionals, rooms, patients, sessions, commissions, reports
-# app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
-# app.include_router(professionals.router, prefix="/api/v1/professionals", tags=["professionals"])
-# etc...
+# Import and include routers
+from app.api import auth, professionals, rooms, patients, sessions, commissions
+
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["Autenticación"])
+app.include_router(professionals.router, prefix="/api/v1/professionals", tags=["Profesionales"])
+app.include_router(rooms.router, prefix="/api/v1/rooms", tags=["Consultorios"])
+app.include_router(patients.router, prefix="/api/v1/patients", tags=["Pacientes"])
+app.include_router(sessions.router, prefix="/api/v1/sessions", tags=["Sesiones"])
+app.include_router(commissions.router, prefix="/api/v1/commissions", tags=["Comisiones"])
 
 
 if __name__ == "__main__":

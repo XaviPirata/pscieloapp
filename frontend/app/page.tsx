@@ -1,178 +1,216 @@
 'use client'
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { Lock, Mail, ArrowRight, Sparkles } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Lock, Mail, ArrowRight, Sparkles, Eye, EyeOff } from 'lucide-react'
+import toast from 'react-hot-toast'
+import api from '@/lib/api'
 
-export default function Home() {
+export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    // TODO: Implement login logic
-    setTimeout(() => setLoading(false), 1000)
+    try {
+      const res = await api.post('/auth/login', { email, password })
+      localStorage.setItem('access_token', res.data.access_token)
+      localStorage.setItem('refresh_token', res.data.refresh_token)
+      toast.success('Bienvenido a PsCielo')
+      router.push('/dashboard')
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || 'Error al iniciar sesión')
+    } finally {
+      setLoading(false)
+    }
   }
 
+  if (!mounted) return null
+
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-neomorphic-bg via-neomorphic-tertiary to-neomorphic-secondary overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#f5f7fc] via-[#f0f2f9] to-[#eef0f8]">
+      {/* Ambient animated blobs */}
+      <div className="pointer-events-none absolute inset-0">
         <motion.div
-          className="absolute top-0 -right-1/2 w-96 h-96 bg-neomorphic-primary rounded-full opacity-20 blur-3xl"
-          animate={{ y: [0, 30, 0], x: [0, -30, 0] }}
-          transition={{ duration: 8, repeat: Infinity }}
+          className="absolute -right-32 -top-32 h-[500px] w-[500px] rounded-full bg-neomorphic-primary/15 blur-[100px]"
+          animate={{
+            x: [0, 40, -20, 0],
+            y: [0, -30, 20, 0],
+            scale: [1, 1.1, 0.95, 1],
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="absolute -bottom-1/2 -left-1/2 w-96 h-96 bg-neomorphic-secondary rounded-full opacity-20 blur-3xl"
-          animate={{ y: [0, -30, 0], x: [0, 30, 0] }}
-          transition={{ duration: 10, repeat: Infinity, delay: 1 }}
+          className="absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full bg-neomorphic-secondary/15 blur-[100px]"
+          animate={{
+            x: [0, -30, 40, 0],
+            y: [0, 40, -20, 0],
+            scale: [1, 0.95, 1.1, 1],
+          }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+        />
+        <motion.div
+          className="absolute left-1/3 top-1/4 h-[300px] w-[300px] rounded-full bg-pastel-purple/10 blur-[80px]"
+          animate={{
+            x: [0, 20, -20, 0],
+            y: [0, -20, 20, 0],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
         />
       </div>
 
-      {/* Login Container */}
-      <div className="relative flex items-center justify-center min-h-screen px-4">
+      {/* Floating particles */}
+      <div className="pointer-events-none absolute inset-0">
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute h-1 w-1 rounded-full bg-neomorphic-primary/30"
+            style={{
+              left: `${15 + i * 15}%`,
+              top: `${20 + (i * 12) % 60}%`,
+            }}
+            animate={{
+              y: [0, -30, 0],
+              opacity: [0.2, 0.6, 0.2],
+            }}
+            transition={{
+              duration: 3 + i * 0.5,
+              repeat: Infinity,
+              delay: i * 0.8,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Login card */}
+      <motion.div
+        initial={{ opacity: 0, y: 30, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.7, type: 'spring', stiffness: 200 }}
+        className="relative z-10 w-full max-w-[420px] px-4"
+      >
+        {/* Logo */}
+        <div className="mb-8 text-center">
+          <motion.div
+            className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br from-neomorphic-primary to-neomorphic-primary-dark shadow-[0_8px_30px_rgba(255,179,204,0.4)]"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+          >
+            <Sparkles className="h-8 w-8 text-white" />
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-4xl font-extrabold tracking-tight"
+          >
+            <span className="bg-gradient-to-r from-neomorphic-primary-dark via-slate-700 to-neomorphic-secondary-dark bg-clip-text text-transparent">
+              PsCielo
+            </span>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.35 }}
+            className="mt-1 text-sm text-slate-400"
+          >
+            Sistema de Gestión Integral
+          </motion.p>
+        </div>
+
+        {/* Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="w-full max-w-md"
+          transition={{ delay: 0.3 }}
+          className="rounded-3xl bg-white/70 p-8 shadow-neomorphic backdrop-blur-xl"
         >
-          {/* Logo and Header */}
-          <div className="text-center mb-8">
-            <motion.div
-              className="flex items-center justify-center mb-4"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-            >
-              <Sparkles className="w-12 h-12 text-neomorphic-primary" />
-            </motion.div>
-            <h1 className="text-4xl font-bold mb-2">
-              <span className="text-gradient">PsCielo</span>
-            </h1>
-            <p className="text-text-secondary text-lg">Sistema de Gestión</p>
-          </div>
-
-          {/* Login Form Card */}
-          <motion.div
-            className="neomorphic-base p-8 space-y-6"
-            whileHover={{ boxShadow: 'var(--shadow-large)' }}
-          >
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Email Field */}
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
-                  Correo Electrónico
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3.5 w-5 h-5 text-text-light" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="tu@email.com"
-                    className="neomorphic-input w-full pl-10"
-                    required
-                  />
-                </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-600">
+                Correo Electrónico
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-300" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="tu@email.com"
+                  required
+                  className="w-full rounded-2xl bg-neomorphic-light-shade/80 py-3.5 pl-11 pr-4 text-sm text-slate-700 shadow-neomorphic-inset outline-none transition-all placeholder:text-slate-300 focus:bg-white focus:shadow-neomorphic focus:ring-2 focus:ring-neomorphic-secondary/30"
+                />
               </div>
+            </div>
 
-              {/* Password Field */}
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">
-                  Contraseña
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3.5 w-5 h-5 text-text-light" />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="neomorphic-input w-full pl-10"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Remember me and forgot password */}
-              <div className="flex items-center justify-between">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    className="neomorphic-input w-4 h-4 mr-2"
-                  />
-                  <span className="text-sm text-text-secondary">Recuérdame</span>
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-sm text-neomorphic-primary hover:text-neomorphic-primary-dark transition-colors"
+            {/* Password */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-slate-600">
+                Contraseña
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-slate-300" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Tu contraseña"
+                  required
+                  className="w-full rounded-2xl bg-neomorphic-light-shade/80 py-3.5 pl-11 pr-12 text-sm text-slate-700 shadow-neomorphic-inset outline-none transition-all placeholder:text-slate-300 focus:bg-white focus:shadow-neomorphic focus:ring-2 focus:ring-neomorphic-secondary/30"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 transition-colors hover:text-slate-500"
                 >
-                  ¿Olvidaste tu contraseña?
-                </Link>
+                  {showPassword ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+                </button>
               </div>
-
-              {/* Submit Button */}
-              <motion.button
-                type="submit"
-                disabled={loading}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="neomorphic-button w-full bg-gradient-to-r from-neomorphic-primary to-neomorphic-primary-dark text-text-primary font-semibold flex items-center justify-center gap-2 mt-6"
-              >
-                {loading ? (
-                  <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    Ingresar
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </motion.button>
-            </form>
-
-            {/* Divider */}
-            <div className="flex items-center gap-3 my-6">
-              <div className="flex-1 h-px bg-text-light opacity-20" />
-              <span className="text-sm text-text-light">o</span>
-              <div className="flex-1 h-px bg-text-light opacity-20" />
             </div>
 
-            {/* OAuth Buttons (Future) */}
-            <div className="grid grid-cols-2 gap-3">
-              <button className="neomorphic-button text-sm hover:bg-neomorphic-light-shade">
-                Google
-              </button>
-              <button className="neomorphic-button text-sm hover:bg-neomorphic-light-shade">
-                Zoho
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Sign up link */}
-          <p className="text-center mt-6 text-text-secondary">
-            ¿No tienes cuenta?{' '}
-            <Link
-              href="/signup"
-              className="text-neomorphic-primary font-semibold hover:text-neomorphic-primary-dark transition-colors"
+            {/* Submit */}
+            <motion.button
+              type="submit"
+              disabled={loading || !email || !password}
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-neomorphic-primary to-neomorphic-primary-dark py-3.5 font-semibold text-slate-700 shadow-neomorphic transition-all hover:shadow-neomorphic-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Registrate aquí
-            </Link>
-          </p>
+              {loading ? (
+                <motion.div
+                  className="h-5 w-5 rounded-full border-2 border-current border-t-transparent"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
+                />
+              ) : (
+                <>
+                  Ingresar
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
+            </motion.button>
+          </form>
         </motion.div>
-      </div>
 
-      {/* Footer */}
-      <motion.div
-        className="absolute bottom-6 left-0 right-0 text-center text-text-light text-sm"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.6 }}
-        transition={{ delay: 1 }}
-      >
-        <p>© 2026 PsCielo. Todos los derechos reservados.</p>
+        {/* Footer */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.4 }}
+          transition={{ delay: 1 }}
+          className="mt-8 text-center text-xs text-slate-400"
+        >
+          PsCielo v0.1.0 &middot; Centro Psicológico
+        </motion.p>
       </motion.div>
     </div>
   )

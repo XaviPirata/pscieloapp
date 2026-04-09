@@ -2,177 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Neumorphic Design System - Global Styles */
+@layer base {
+  :root {
+    --text-primary: #2c3e50;
+    --text-secondary: #5a6c7d;
+    --text-light: #8b9aaf;
+  }
 
-:root {
-  /* Neumorphic Colors */
-  --neomorphic-bg: #f5f7fc;
-  --neomorphic-bg-secondary: #ffffff;
-  --neomorphic-light: #ffffff;
-  --neomorphic-light-shade: #f0f2f9;
+  * {
+    @apply m-0 p-0 box-border;
+  }
 
-  /* Accent Colors - Pastel */
-  --neomorphic-primary: #FFD6E0;
-  --neomorphic-primary-light: #ffe8f0;
-  --neomorphic-primary-dark: #ffb3cc;
-  --neomorphic-secondary: #D6EAF8;
-  --neomorphic-secondary-light: #e8f4fc;
-  --neomorphic-secondary-dark: #b3daf0;
-  --neomorphic-tertiary: #EEF2F7;
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-  /* Status Colors */
-  --neomorphic-success: #A8E6CF;
-  --neomorphic-warning: #FFD93D;
-  --neomorphic-danger: #FFB3BA;
-  --neomorphic-info: #B3E5FC;
-
-  /* Text Colors */
-  --text-primary: #2c3e50;
-  --text-secondary: #5a6c7d;
-  --text-light: #8b9aaf;
-
-  /* Shadows */
-  --shadow-light: 3px 3px 7px rgba(163, 174, 208, 0.2), -3px -3px 7px rgba(255, 255, 255, 0.9);
-  --shadow-medium: 5px 5px 12px rgba(163, 174, 208, 0.25), -5px -5px 12px rgba(255, 255, 255, 0.95);
-  --shadow-large: 8px 8px 16px rgba(163, 174, 208, 0.3), -8px -8px 16px rgba(255, 255, 255, 1);
-
-  /* Border Radius */
-  --radius-sm: 12px;
-  --radius: 16px;
-  --radius-lg: 20px;
-
-  /* Transitions */
-  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  body {
+    @apply font-sans antialiased;
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
 }
 
-* {
-  @apply m-0 p-0 box-border;
+@layer utilities {
+  .text-text-primary { color: var(--text-primary); }
+  .text-text-secondary { color: var(--text-secondary); }
+  .text-text-light { color: var(--text-light); }
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  @apply bg-neomorphic-bg font-sans text-text-primary antialiased;
-  background: linear-gradient(135deg, #f5f7fc 0%, #f0f2f9 100%);
-  min-height: 100vh;
-}
-
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-  @apply w-2 h-2;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-neomorphic-light-shade;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-neomorphic-primary rounded-full;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-neomorphic-primary-dark;
-}
+/* Scrollbar */
+::-webkit-scrollbar { @apply w-1.5 h-1.5; }
+::-webkit-scrollbar-track { @apply bg-transparent; }
+::-webkit-scrollbar-thumb { @apply bg-slate-200 rounded-full hover:bg-slate-300; }
 
 /* Selection */
-::selection {
-  @apply bg-neomorphic-secondary text-text-primary;
-}
-
-/* Neumorphic Component Base Classes */
-.neomorphic-base {
-  @apply rounded-neomorphic bg-neomorphic-light shadow-neomorphic;
-  transition: all var(--transition-base);
-}
-
-.neomorphic-hover:hover {
-  @apply shadow-neomorphic-lg;
-  transform: translate(-2px, -2px);
-}
-
-.neomorphic-press:active {
-  @apply shadow-neomorphic-sm;
-  transform: translate(2px, 2px);
-}
-
-.neomorphic-button {
-  @apply neomorphic-base neomorphic-hover neomorphic-press px-6 py-3 font-medium;
-  @apply cursor-pointer select-none transition-all;
-}
-
-.neomorphic-card {
-  @apply neomorphic-base p-6;
-}
-
-.neomorphic-input {
-  @apply neomorphic-base px-4 py-3 font-base;
-  @apply focus:outline-none focus:ring-2 focus:ring-neomorphic-secondary focus:shadow-neomorphic;
-  @apply disabled:opacity-50 disabled:cursor-not-allowed;
-}
-
-/* Text Utilities */
-.text-gradient {
-  @apply bg-gradient-to-r from-neomorphic-primary via-neomorphic-secondary to-neomorphic-tertiary bg-clip-text text-transparent;
-}
-
-.glass-effect {
-  @apply bg-white/50 backdrop-blur-md border border-white/20;
-}
-
-/* Animation utilities */
-@keyframes fadeIn {
-  from {
-    @apply opacity-0;
-  }
-  to {
-    @apply opacity-100;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    @apply translate-y-5 opacity-0;
-  }
-  to {
-    @apply translate-y-0 opacity-100;
-  }
-}
-
-.animate-in {
-  @apply animate-fadeIn;
-}
-
-.animate-slide-up {
-  @apply animate-slideUp;
-}
-
-/* Print Styles */
-@media print {
-  body {
-    @apply bg-white;
-  }
-  .no-print {
-    @apply hidden;
-  }
-}
+::selection { @apply bg-neomorphic-secondary/40 text-slate-800; }
 
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
-  * {
-    @apply !transition-none !animate-none;
-  }
-}
-
-/* Dark mode support (future) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --neomorphic-bg: #1a1f2e;
-    --neomorphic-light: #2a3142;
-    --text-primary: #e8eef7;
-    --text-secondary: #b0bac9;
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -1,7 +1,7 @@
 # PsCielo - Setup Guide
 
 > **Última actualización:** 9 de Abril 2026
-> **Etapa actual:** FASE 2A + 2B Completadas - Endpoints CRUD + Auth JWT
+> **Etapa actual:** FASE 3 Completada - Frontend Impactante
 
 ---
 
@@ -466,18 +466,28 @@ jobs:
 - [x] Seed superadmin endpoint (para BD vacía)
 - [x] Password hashing con bcrypt
 
-### FASE 2C
-- [ ] Gmail API setup y integración
-- [ ] Instagram Graph API setup
-- [ ] SendGrid email service
-- [ ] Celery tasks
+### FASE 2C (DIFERIDA - Hacer después de FASE 3)
+- [ ] Gmail API setup y integración (requiere Google Cloud Console)
+- [ ] Instagram Graph API setup (requiere Facebook Developer)
+- [ ] SendGrid email service (requiere cuenta SendGrid)
+- [ ] Celery tasks para procesamiento asíncrono
+- **Nota:** No bloquea el frontend. Se integrará cuando las credenciales estén listas.
 
-### FASE 3
-- [ ] Componentes neumorphism
-- [ ] Dashboard home
-- [ ] CRUD UIs (profesionales, pacientes, sesiones)
-- [ ] Reportes y analytics
-- [ ] Testeo exhaustivo en navegadores
+### FASE 3 ✅
+- [x] Librería de componentes neumorphism (Button, Card, Input, Badge, Modal)
+- [x] Sidebar con animaciones, active indicator, collapse/expand
+- [x] Header con búsqueda expandible, notificaciones, perfil dropdown
+- [x] Dashboard home: StatCards animados (counter), WeeklyChart, ActivityFeed, UpcomingSessions, QuickActions, ProfessionalOverview
+- [x] Página Profesionales: grid/list view, search, modal crear, tarjetas con stats
+- [x] Página Pacientes: tabla con búsqueda, stats row, modal crear, badges por origen
+- [x] Página Sesiones: vista calendario semanal, slots por hora, modal detalle, modal crear
+- [x] Login page: blobs animados, partículas flotantes, glassmorphism, show/hide password
+- [x] Sistema de diseño neumorphism 2026: soft shadows, gradientes pastel, micro-interactions
+- [x] API client (Axios) con auto-refresh JWT interceptor
+- [x] Utilidades: formatCurrency, formatDate, getGreeting, getInitials, cn()
+- [x] Constantes: roles, estados, colores, navegación
+- [ ] Reportes y analytics (pendiente para iteración futura)
+- [ ] Testeo exhaustivo en navegadores (pendiente para deploy)
 
 ### FASE 4
 - [ ] Deployment en Coolify

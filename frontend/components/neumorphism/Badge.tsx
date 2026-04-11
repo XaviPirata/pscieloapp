@@ -12,13 +12,13 @@ interface BadgeProps {
 }
 
 const colors = {
-  rose: 'bg-pastel-rose/60 text-rose-700 border-rose-200/50',
-  blue: 'bg-pastel-blue/60 text-blue-700 border-blue-200/50',
-  green: 'bg-pastel-green/60 text-green-700 border-green-200/50',
-  purple: 'bg-pastel-purple/60 text-purple-700 border-purple-200/50',
-  yellow: 'bg-pastel-yellow/60 text-yellow-700 border-yellow-200/50',
-  gray: 'bg-pastel-gray/60 text-slate-600 border-slate-200/50',
-  red: 'bg-red-100/60 text-red-700 border-red-200/50',
+  rose: 'bg-pastel-rose/60 text-rose-700 border-rose-200/50 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/40',
+  blue: 'bg-pastel-blue/60 text-blue-700 border-blue-200/50 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/40',
+  green: 'bg-pastel-green/60 text-green-700 border-green-200/50 dark:bg-green-950/60 dark:text-green-300 dark:border-green-800/40',
+  purple: 'bg-pastel-purple/60 text-purple-700 border-purple-200/50 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800/40',
+  yellow: 'bg-pastel-yellow/60 text-yellow-700 border-yellow-200/50 dark:bg-yellow-950/60 dark:text-yellow-300 dark:border-yellow-800/40',
+  gray: 'bg-pastel-gray/60 text-slate-600 border-slate-200/50 dark:bg-slate-800/60 dark:text-slate-400 dark:border-slate-700/40',
+  red: 'bg-red-100/60 text-red-700 border-red-200/50 dark:bg-red-950/60 dark:text-red-300 dark:border-red-800/40',
 }
 
 const badgeSizes = {

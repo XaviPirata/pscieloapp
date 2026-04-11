@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Calendar, UserPlus, CreditCard, Clock, CheckCircle2 } from 'lucide-react'
+import { Calendar, UserPlus, CreditCard, CheckCircle2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface Activity {
@@ -45,9 +45,9 @@ const item = {
 
 export default function ActivityFeed() {
   return (
-    <div className="rounded-3xl bg-white/80 p-6 shadow-neomorphic backdrop-blur-sm">
+    <div className="rounded-3xl bg-white/80 dark:bg-slate-800/80 p-6 shadow-neomorphic backdrop-blur-sm">
       <div className="mb-5 flex items-center justify-between">
-        <h3 className="text-lg font-bold text-slate-700">Actividad Reciente</h3>
+        <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200">Actividad Reciente</h3>
         <button className="text-xs font-medium text-neomorphic-primary-dark hover:underline">
           Ver todo
         </button>
@@ -78,13 +78,13 @@ export default function ActivityFeed() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-slate-600">{activity.title}</p>
-                <p className="truncate text-xs text-slate-400">{activity.description}</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">{activity.title}</p>
+                <p className="truncate text-xs text-slate-400 dark:text-slate-500">{activity.description}</p>
               </div>
 
               <div className="shrink-0 text-right">
-                <p className="text-[10px] text-slate-300">{activity.time}</p>
-                <p className="text-[10px] font-medium text-slate-400">{activity.user}</p>
+                <p className="text-[10px] text-slate-300 dark:text-slate-600">{activity.time}</p>
+                <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">{activity.user}</p>
               </div>
             </motion.div>
           )

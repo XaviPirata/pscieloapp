@@ -1,0 +1,112 @@
+#
+# PsCielo - Producción (Coolify + Traefik)
+#
+# Variables de entorno que se configuran en Coolify:
+#   - POSTGRES_PASSWORD          (password de Postgres, generar fuerte)
+#   - SECRET_KEY                 (JWT secret, 32+ chars aleatorios)
+#   - SEED_SUPERADMIN_EMAIL      (ej: admin@pscielo.com)
+#   - SEED_SUPERADMIN_PASSWORD   (password inicial SUPERADMIN)
+#   - FRONTEND_DOMAIN            (ej: app.pscielo.com)
+#   - BACKEND_DOMAIN             (ej: api.pscielo.com)
+#   - NEXT_PUBLIC_API_URL        (ej: https://api.pscielo.com)
+#
+# Coolify inyecta labels Traefik automáticamente cuando se configuran
+# los dominios de cada servicio desde la UI. Por eso acá NO hardcodeamos
+# labels traefik - Coolify los agrega.
+#
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: pscielo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: pscielo_prod
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8"
+    volumes:
+      - pscielo_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pscielo -d pscielo_prod"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - pscielo_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
+    environment:
+      DATABASE_URL: postgresql://pscielo:${POSTGRES_PASSWORD}@postgres:5432/pscielo_prod
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: "false"
+      ENVIRONMENT: production
+      ALLOWED_ORIGINS: '["https://${FRONTEND_DOMAIN}","https://${BACKEND_DOMAIN}"]'
+      FRONTEND_URL: https://${FRONTEND_DOMAIN}
+      BACKEND_URL: https://${BACKEND_DOMAIN}
+      SEED_SUPERADMIN_EMAIL: ${SEED_SUPERADMIN_EMAIL}
+      SEED_SUPERADMIN_PASSWORD: ${SEED_SUPERADMIN_PASSWORD}
+      SEED_SUPERADMIN_FIRST_NAME: Super
+      SEED_SUPERADMIN_LAST_NAME: Admin
+    expose:
+      - "8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A app.tasks worker --loglevel=info
+    environment:
+      DATABASE_URL: postgresql://pscielo:${POSTGRES_PASSWORD}@postgres:5432/pscielo_prod
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: "false"
+      ENVIRONMENT: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      NODE_ENV: production
+    expose:
+      - "3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  pscielo_postgres_data:
+  pscielo_redis_data:

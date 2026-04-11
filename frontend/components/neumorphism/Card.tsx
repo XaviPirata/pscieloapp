@@ -11,17 +11,33 @@ interface CardProps extends Omit<HTMLMotionProps<'div'>, 'ref'> {
 }
 
 const variantStyles = {
-  elevated: 'bg-white/90 shadow-neomorphic',
-  flat: 'bg-white/60 shadow-neomorphic-sm',
-  glass: 'bg-white/30 backdrop-blur-xl border border-white/40 shadow-elevate-2',
-  inset: 'bg-neomorphic-light-shade shadow-neomorphic-inset',
+  elevated: [
+    'bg-white/90 dark:bg-slate-900/80',
+    'shadow-neomorphic',
+    'dark:border dark:border-white/[0.05]',
+  ].join(' '),
+  flat: [
+    'bg-white/60 dark:bg-slate-900/60',
+    'shadow-neomorphic-sm',
+    'dark:border dark:border-white/[0.04]',
+  ].join(' '),
+  glass: [
+    'bg-white/30 dark:bg-slate-900/20',
+    'backdrop-blur-xl',
+    'border border-white/40 dark:border-white/[0.06]',
+    'shadow-elevate-2',
+  ].join(' '),
+  inset: [
+    'bg-neomorphic-light-shade dark:bg-slate-950/70',
+    'shadow-neomorphic-inset',
+  ].join(' '),
 }
 
 const glowStyles = {
-  rose: 'hover:shadow-[0_0_30px_rgba(255,214,224,0.5)]',
-  blue: 'hover:shadow-[0_0_30px_rgba(214,234,248,0.5)]',
-  purple: 'hover:shadow-[0_0_30px_rgba(232,213,240,0.5)]',
-  green: 'hover:shadow-[0_0_30px_rgba(168,230,207,0.5)]',
+  rose: 'hover:shadow-[0_0_30px_rgba(255,214,224,0.5)] dark:hover:shadow-[0_0_30px_rgba(244,63,94,0.25)]',
+  blue: 'hover:shadow-[0_0_30px_rgba(214,234,248,0.5)] dark:hover:shadow-[0_0_30px_rgba(59,130,246,0.25)]',
+  purple: 'hover:shadow-[0_0_30px_rgba(232,213,240,0.5)] dark:hover:shadow-[0_0_30px_rgba(168,85,247,0.25)]',
+  green: 'hover:shadow-[0_0_30px_rgba(168,230,207,0.5)] dark:hover:shadow-[0_0_30px_rgba(34,197,94,0.25)]',
   none: '',
 }
 

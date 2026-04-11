@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
-  Plus, Search, Filter, MoreHorizontal,
-  Phone, Mail, Star, Calendar,
+  Plus, Search, MoreHorizontal,
+  Mail, Star, Calendar,
 } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import NeuButton from '@/components/neumorphism/Button'
@@ -86,14 +86,14 @@ export default function ProfessionalsPage() {
 
           <div className="flex gap-2">
             {/* View toggle */}
-            <div className="flex gap-1 rounded-xl bg-white/60 p-1 shadow-neomorphic-sm">
+            <div className="flex gap-1 rounded-xl bg-white/60 dark:bg-slate-900/60 p-1 shadow-neomorphic-sm">
               <button
                 onClick={() => setViewMode('grid')}
                 className={cn(
                   'rounded-lg px-3 py-2 text-xs font-medium transition-all',
                   viewMode === 'grid'
-                    ? 'bg-white text-slate-700 shadow-neomorphic-sm'
-                    : 'text-slate-400 hover:text-slate-600',
+                    ? 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-neomorphic-sm'
+                    : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300',
                 )}
               >
                 Tarjetas
@@ -103,8 +103,8 @@ export default function ProfessionalsPage() {
                 className={cn(
                   'rounded-lg px-3 py-2 text-xs font-medium transition-all',
                   viewMode === 'list'
-                    ? 'bg-white text-slate-700 shadow-neomorphic-sm'
-                    : 'text-slate-400 hover:text-slate-600',
+                    ? 'bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-neomorphic-sm'
+                    : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300',
                 )}
               >
                 Lista
@@ -156,7 +156,7 @@ export default function ProfessionalsPage() {
                       {getInitials(prof.name)}
                     </motion.div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-slate-700">{prof.name}</h3>
+                      <h3 className="font-bold text-slate-700 dark:text-slate-200">{prof.name}</h3>
                       <div className="mt-1 flex flex-wrap gap-1">
                         {prof.specialties.map((s) => (
                           <NeuBadge key={s} variant="blue" size="sm">{s}</NeuBadge>
@@ -174,26 +174,26 @@ export default function ProfessionalsPage() {
 
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div className="rounded-xl bg-neomorphic-light-shade/50 p-2.5 text-center">
-                      <p className="text-lg font-bold text-slate-700">{prof.sessions}</p>
-                      <p className="text-[10px] text-slate-400">Sesiones/mes</p>
+                    <div className="rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-2.5 text-center">
+                      <p className="text-lg font-bold text-slate-700 dark:text-slate-200">{prof.sessions}</p>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500">Sesiones/mes</p>
                     </div>
-                    <div className="rounded-xl bg-neomorphic-light-shade/50 p-2.5 text-center">
-                      <p className="text-lg font-bold text-slate-700">${(prof.hourlyRate / 1000).toFixed(0)}k</p>
-                      <p className="text-[10px] text-slate-400">Por sesión</p>
+                    <div className="rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-2.5 text-center">
+                      <p className="text-lg font-bold text-slate-700 dark:text-slate-200">${(prof.hourlyRate / 1000).toFixed(0)}k</p>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500">Por sesión</p>
                     </div>
-                    <div className="rounded-xl bg-neomorphic-light-shade/50 p-2.5 text-center">
+                    <div className="rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-2.5 text-center">
                       <div className="flex items-center justify-center gap-0.5">
                         <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                        <p className="text-lg font-bold text-slate-700">{prof.rating}</p>
+                        <p className="text-lg font-bold text-slate-700 dark:text-slate-200">{prof.rating}</p>
                       </div>
-                      <p className="text-[10px] text-slate-400">Rating</p>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500">Rating</p>
                     </div>
                   </div>
 
                   {/* Contact */}
                   <div className="flex items-center gap-4 text-xs text-slate-400">
-                    <span className="flex items-center gap-1">
+                    <span className="flex items-center gap-1 text-slate-400 dark:text-slate-500">
                       <Mail className="h-3 w-3" /> {prof.email}
                     </span>
                   </div>
@@ -219,10 +219,10 @@ export default function ProfessionalsPage() {
             variants={container}
             initial="hidden"
             animate="show"
-            className="rounded-3xl bg-white/80 shadow-neomorphic backdrop-blur-sm overflow-hidden"
+            className="rounded-3xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic backdrop-blur-sm overflow-hidden dark:border dark:border-white/[0.05]"
           >
             {/* Table header */}
-            <div className="grid grid-cols-12 gap-4 border-b border-slate-100 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <div className="grid grid-cols-12 gap-4 border-b border-slate-100 dark:border-slate-800 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-600">
               <div className="col-span-3">Profesional</div>
               <div className="col-span-3">Especialidades</div>
               <div className="col-span-1 text-center">Sesiones</div>
@@ -239,7 +239,7 @@ export default function ProfessionalsPage() {
                 whileHover={{ backgroundColor: 'rgba(245,247,252,0.5)' }}
                 className={cn(
                   'grid grid-cols-12 items-center gap-4 px-6 py-4 cursor-pointer transition-colors',
-                  i < filtered.length - 1 && 'border-b border-slate-50',
+                  i < filtered.length - 1 && 'border-b border-slate-50 dark:border-slate-800/80',
                 )}
               >
                 <div className="col-span-3 flex items-center gap-3">
@@ -251,8 +251,8 @@ export default function ProfessionalsPage() {
                     {getInitials(prof.name)}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-slate-700">{prof.name}</p>
-                    <p className="text-xs text-slate-400">{prof.email}</p>
+                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{prof.name}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">{prof.email}</p>
                   </div>
                 </div>
                 <div className="col-span-3 flex flex-wrap gap-1">
@@ -260,13 +260,13 @@ export default function ProfessionalsPage() {
                     <NeuBadge key={s} variant="blue" size="sm">{s}</NeuBadge>
                   ))}
                 </div>
-                <div className="col-span-1 text-center text-sm font-semibold text-slate-600">
+                <div className="col-span-1 text-center text-sm font-semibold text-slate-600 dark:text-slate-300">
                   {prof.sessions}
                 </div>
-                <div className="col-span-2 text-center text-sm font-semibold text-slate-600">
+                <div className="col-span-2 text-center text-sm font-semibold text-slate-600 dark:text-slate-300">
                   ${prof.hourlyRate.toLocaleString('es-AR')}
                 </div>
-                <div className="col-span-1 text-center text-sm text-slate-500">
+                <div className="col-span-1 text-center text-sm text-slate-500 dark:text-slate-400">
                   {prof.commission}%
                 </div>
                 <div className="col-span-1 flex justify-center">
@@ -279,7 +279,7 @@ export default function ProfessionalsPage() {
                   </NeuBadge>
                 </div>
                 <div className="col-span-1 flex justify-end">
-                  <button className="rounded-xl p-2 text-slate-300 hover:bg-slate-50 hover:text-slate-500 transition-colors">
+                  <button className="rounded-xl p-2 text-slate-300 dark:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-500 dark:hover:text-slate-400 transition-colors">
                     <MoreHorizontal className="h-4 w-4" />
                   </button>
                 </div>

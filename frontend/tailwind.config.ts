@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
+  darkMode: 'class',
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -57,11 +58,11 @@ const config: Config = {
         },
       },
       boxShadow: {
-        // Neumorphic shadows - soft and subtle
-        'neomorphic-sm': '3px 3px 7px rgba(163, 174, 208, 0.2), -3px -3px 7px rgba(255, 255, 255, 0.9)',
-        'neomorphic': '5px 5px 12px rgba(163, 174, 208, 0.25), -5px -5px 12px rgba(255, 255, 255, 0.95)',
-        'neomorphic-lg': '8px 8px 16px rgba(163, 174, 208, 0.3), -8px -8px 16px rgba(255, 255, 255, 1)',
-        'neomorphic-inset': 'inset 3px 3px 7px rgba(163, 174, 208, 0.2), inset -3px -3px 7px rgba(255, 255, 255, 0.9)',
+        // Neumorphic shadows - driven by CSS variables for dark mode support
+        'neomorphic-sm': 'var(--shadow-neomorphic-sm)',
+        'neomorphic': 'var(--shadow-neomorphic)',
+        'neomorphic-lg': 'var(--shadow-neomorphic-lg)',
+        'neomorphic-inset': 'var(--shadow-neomorphic-inset)',
 
         // Elevation system for modern depth
         'elevate-1': '0 2px 4px rgba(0, 0, 0, 0.05)',

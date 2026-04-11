@@ -19,6 +19,12 @@ async def lifespan(app: FastAPI):
     print(f"🚀 Starting {settings.APP_NAME} v{settings.APP_VERSION}")
     # Create database tables if they don't exist
     Base.metadata.create_all(bind=engine)
+    # Seed initial SUPERADMIN (idempotent)
+    try:
+        from app.seed import seed_superadmin
+        seed_superadmin()
+    except Exception as e:
+        print(f"⚠️  Seed skipped: {e}")
     yield
     # Shutdown
     print(f"🛑 Shutting down {settings.APP_NAME}")

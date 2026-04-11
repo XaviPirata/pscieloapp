@@ -88,7 +88,7 @@ export default function StatCard({
       transition={{ delay: delay / 1000, type: 'spring', stiffness: 200, damping: 20 }}
       whileHover={{ y: -5, scale: 1.02 }}
       className={cn(
-        'relative overflow-hidden rounded-3xl bg-white/80 p-6',
+        'relative overflow-hidden rounded-3xl bg-white/80 dark:bg-slate-800/80 p-6',
         'shadow-neomorphic backdrop-blur-sm',
         'transition-shadow duration-300',
         `hover:${colors.glow}`,
@@ -104,10 +104,10 @@ export default function StatCard({
 
       <div className="relative z-10 flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-slate-400">{title}</p>
+          <p className="text-sm font-medium text-slate-400 dark:text-slate-500">{title}</p>
           <div className="mt-2 flex items-baseline gap-1">
             <motion.span
-              className="text-3xl font-bold text-slate-700"
+              className="text-3xl font-bold text-slate-700 dark:text-slate-200"
               key={animatedValue}
             >
               {prefix}{animatedValue.toLocaleString('es-AR')}{suffix}
@@ -127,7 +127,7 @@ export default function StatCard({
                 {change >= 0 ? '+' : ''}{change}%
               </span>
               {changeLabel && (
-                <span className="text-xs text-slate-400">{changeLabel}</span>
+                <span className="text-xs text-slate-400 dark:text-slate-500">{changeLabel}</span>
               )}
             </div>
           )}

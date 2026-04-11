@@ -4,7 +4,8 @@ import { forwardRef } from 'react'
 import { motion, type HTMLMotionProps } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
-interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'ref'> {
+interface ButtonProps extends Omit<HTMLMotionProps<'button'>, 'ref' | 'children'> {
+  children?: React.ReactNode
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'success'
   size?: 'sm' | 'md' | 'lg'
   loading?: boolean
@@ -17,7 +18,7 @@ const variants = {
   secondary:
     'bg-gradient-to-br from-neomorphic-secondary to-neomorphic-secondary-dark text-slate-700 shadow-neomorphic hover:shadow-neomorphic-lg',
   ghost:
-    'bg-white/60 backdrop-blur-sm text-slate-600 shadow-neomorphic-sm hover:shadow-neomorphic hover:bg-white/80',
+    'bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm text-slate-600 dark:text-slate-300 shadow-neomorphic-sm hover:shadow-neomorphic hover:bg-white/80 dark:hover:bg-slate-800/90',
   danger:
     'bg-gradient-to-br from-neomorphic-danger to-red-300 text-red-800 shadow-neomorphic hover:shadow-neomorphic-lg',
   success:

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Lock, Mail, ArrowRight, Sparkles, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
 import api from '@/lib/api'
@@ -36,7 +36,7 @@ export default function LoginPage() {
   if (!mounted) return null
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#f5f7fc] via-[#f0f2f9] to-[#eef0f8]">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-[#f5f7fc] via-[#f0f2f9] to-[#eef0f8] dark:from-[#0f1117] dark:via-[#141624] dark:to-[#111320]">
       {/* Ambient animated blobs */}
       <div className="pointer-events-none absolute inset-0">
         <motion.div
@@ -132,12 +132,12 @@ export default function LoginPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="rounded-3xl bg-white/70 p-8 shadow-neomorphic backdrop-blur-xl"
+          className="rounded-3xl bg-white/70 dark:bg-slate-800/70 p-8 shadow-neomorphic backdrop-blur-xl"
         >
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                 Correo Electrónico
               </label>
               <div className="relative">
@@ -148,14 +148,14 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@email.com"
                   required
-                  className="w-full rounded-2xl bg-neomorphic-light-shade/80 py-3.5 pl-11 pr-4 text-sm text-slate-700 shadow-neomorphic-inset outline-none transition-all placeholder:text-slate-300 focus:bg-white focus:shadow-neomorphic focus:ring-2 focus:ring-neomorphic-secondary/30"
+                  className="w-full rounded-2xl bg-neomorphic-light-shade/80 dark:bg-slate-700/50 py-3.5 pl-11 pr-4 text-sm text-slate-700 dark:text-slate-200 shadow-neomorphic-inset outline-none transition-all placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:bg-white dark:focus:bg-slate-700 focus:shadow-neomorphic focus:ring-2 focus:ring-neomorphic-secondary/30"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-slate-600">
+              <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-300">
                 Contraseña
               </label>
               <div className="relative">
@@ -166,7 +166,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Tu contraseña"
                   required
-                  className="w-full rounded-2xl bg-neomorphic-light-shade/80 py-3.5 pl-11 pr-12 text-sm text-slate-700 shadow-neomorphic-inset outline-none transition-all placeholder:text-slate-300 focus:bg-white focus:shadow-neomorphic focus:ring-2 focus:ring-neomorphic-secondary/30"
+                  className="w-full rounded-2xl bg-neomorphic-light-shade/80 dark:bg-slate-700/50 py-3.5 pl-11 pr-12 text-sm text-slate-700 dark:text-slate-200 shadow-neomorphic-inset outline-none transition-all placeholder:text-slate-300 dark:placeholder:text-slate-600 focus:bg-white dark:focus:bg-slate-700 focus:shadow-neomorphic focus:ring-2 focus:ring-neomorphic-secondary/30"
                 />
                 <button
                   type="button"
@@ -200,6 +200,19 @@ export default function LoginPage() {
               )}
             </motion.button>
           </form>
+
+          {/* DEV: Skip login button (remove in production) */}
+          <div className="mt-4 border-t border-slate-100 dark:border-slate-700 pt-4">
+            <motion.button
+              type="button"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => router.push('/dashboard')}
+              className="w-full rounded-2xl border-2 border-dashed border-slate-200 py-3 text-sm font-medium text-slate-400 transition-all hover:border-neomorphic-secondary hover:text-slate-600 hover:bg-white/40"
+            >
+              Demo: Ir al Dashboard sin login
+            </motion.button>
+          </div>
         </motion.div>
 
         {/* Footer */}

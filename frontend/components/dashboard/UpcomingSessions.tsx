@@ -36,9 +36,9 @@ const item = {
 
 export default function UpcomingSessions() {
   return (
-    <div className="rounded-3xl bg-white/80 p-6 shadow-neomorphic backdrop-blur-sm">
+    <div className="rounded-3xl bg-white/80 dark:bg-slate-800/80 p-6 shadow-neomorphic backdrop-blur-sm">
       <div className="mb-5 flex items-center justify-between">
-        <h3 className="text-lg font-bold text-slate-700">Próximas Sesiones</h3>
+        <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200">Próximas Sesiones</h3>
         <NeuBadge variant="blue" size="md">Hoy</NeuBadge>
       </div>
 
@@ -58,7 +58,7 @@ export default function UpcomingSessions() {
               'bg-gradient-to-r transition-all duration-200 cursor-pointer',
               i === 0
                 ? 'from-neomorphic-primary/15 to-transparent border border-neomorphic-primary/20'
-                : 'from-transparent to-transparent hover:from-slate-50/60',
+                : 'from-transparent to-transparent hover:from-slate-50/60 dark:hover:from-slate-700/30',
             )}
           >
             {/* Time badge */}
@@ -66,7 +66,7 @@ export default function UpcomingSessions() {
               'flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-2xl',
               i === 0
                 ? 'bg-gradient-to-br from-neomorphic-primary to-neomorphic-primary-dark shadow-elevate-2'
-                : 'bg-neomorphic-light-shade',
+                : 'bg-neomorphic-light-shade dark:bg-slate-700/50',
             )}>
               <Clock className={cn('h-3.5 w-3.5 mb-0.5', i === 0 ? 'text-white/80' : 'text-slate-400')} />
               <span className={cn(
@@ -80,7 +80,7 @@ export default function UpcomingSessions() {
             {/* Info */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <p className="text-sm font-semibold text-slate-700">{session.patient}</p>
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{session.patient}</p>
                 {session.status === 'pending' && (
                   <NeuBadge variant="yellow" size="sm">Pendiente</NeuBadge>
                 )}

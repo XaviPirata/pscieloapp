@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import {
   Calendar, Users, Heart, DollarSign,
-  TrendingUp, Sparkles, ArrowRight,
+  TrendingUp, Sparkles,
 } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import StatCard from '@/components/dashboard/StatCard'
@@ -24,10 +24,6 @@ const container = {
   },
 }
 
-const item = {
-  hidden: { opacity: 0, y: 15 },
-  show: { opacity: 1, y: 0 },
-}
 
 export default function DashboardPage() {
   return (
@@ -43,7 +39,7 @@ export default function DashboardPage() {
           className="mb-8"
         >
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-3xl font-bold text-slate-700">
+            <h1 className="text-3xl font-bold text-slate-700 dark:text-slate-200">
               {getGreeting()}, {userName}
             </h1>
             <motion.div
@@ -53,7 +49,7 @@ export default function DashboardPage() {
               <Sparkles className="h-7 w-7 text-neomorphic-primary" />
             </motion.div>
           </div>
-          <p className="text-slate-400">
+          <p className="text-slate-400 dark:text-slate-500">
             Aquí tenés el resumen de tu centro. Hoy tenés <span className="font-semibold text-neomorphic-primary-dark">4 sesiones</span> programadas.
           </p>
         </motion.div>
@@ -138,9 +134,9 @@ export default function DashboardPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.45 }}
-              className="rounded-3xl bg-white/80 p-6 shadow-neomorphic backdrop-blur-sm"
+              className="rounded-3xl bg-white/80 dark:bg-slate-800/80 p-6 shadow-neomorphic backdrop-blur-sm"
             >
-              <h3 className="mb-4 text-lg font-bold text-slate-700">Acciones Rápidas</h3>
+              <h3 className="mb-4 text-lg font-bold text-slate-700 dark:text-slate-200">Acciones Rápidas</h3>
               <div className="grid grid-cols-2 gap-3">
                 <NeuButton
                   variant="primary"
@@ -189,7 +185,7 @@ export default function DashboardPage() {
               <div className="absolute -bottom-10 -left-10 h-24 w-24 rounded-full bg-neomorphic-secondary/20 blur-2xl" />
 
               <div className="relative z-10">
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">Resumen Profesionales</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">Resumen Profesionales</p>
                 <div className="mt-4 space-y-3">
                   {/* Professional mini-cards */}
                   {[
@@ -201,7 +197,7 @@ export default function DashboardPage() {
                         {prof.name[0]}
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-slate-700">{prof.name}</p>
+                        <p className="text-sm font-medium text-slate-700 dark:text-slate-200">{prof.name}</p>
                         <div className="mt-1 h-1.5 w-full rounded-full bg-white/50">
                           <motion.div
                             initial={{ width: 0 }}
@@ -211,7 +207,7 @@ export default function DashboardPage() {
                           />
                         </div>
                       </div>
-                      <span className="text-xs font-semibold text-slate-500">{prof.sessions}/4</span>
+                      <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">{prof.sessions}/4</span>
                     </div>
                   ))}
                 </div>

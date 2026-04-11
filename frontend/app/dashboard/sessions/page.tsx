@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
   Plus, ChevronLeft, ChevronRight, Calendar as CalendarIcon,
   Clock, MapPin, User, CheckCircle2, XCircle, AlertCircle,
@@ -40,12 +40,12 @@ const sessionsData: Record<string, SessionSlot[]> = {
   'Vie 11-15:00': [{ id: '10', time: '15:00', patient: 'Sofía P.', professional: 'Andrea', room: 'C3', status: 'SCHEDULED', type: 'Evaluación' }],
 }
 
-const statusConfig: Record<string, { color: string; icon: any; label: string }> = {
-  SCHEDULED: { color: 'from-pastel-blue/60 to-pastel-blue/30 border-blue-200/40', icon: CalendarIcon, label: 'Programada' },
-  CONFIRMED: { color: 'from-pastel-purple/60 to-pastel-purple/30 border-purple-200/40', icon: CheckCircle2, label: 'Confirmada' },
-  ATTENDED: { color: 'from-pastel-green/60 to-pastel-green/30 border-green-200/40', icon: CheckCircle2, label: 'Asistió' },
-  CANCELLED: { color: 'from-slate-100/60 to-slate-50/30 border-slate-200/40', icon: XCircle, label: 'Cancelada' },
-  NO_SHOW: { color: 'from-pastel-rose/60 to-pastel-rose/30 border-rose-200/40', icon: AlertCircle, label: 'No asistió' },
+const statusConfig: Record<string, { color: string; darkColor: string; icon: any; label: string }> = {
+  SCHEDULED: { color: 'from-pastel-blue/70 to-pastel-blue/40 border-blue-200/40', darkColor: 'dark:from-blue-900/70 dark:to-blue-900/50 dark:border-blue-700/40', icon: CalendarIcon, label: 'Programada' },
+  CONFIRMED: { color: 'from-pastel-purple/70 to-pastel-purple/40 border-purple-200/40', darkColor: 'dark:from-purple-900/70 dark:to-purple-900/50 dark:border-purple-700/40', icon: CheckCircle2, label: 'Confirmada' },
+  ATTENDED: { color: 'from-pastel-green/70 to-pastel-green/40 border-green-200/40', darkColor: 'dark:from-green-900/70 dark:to-green-900/50 dark:border-green-700/40', icon: CheckCircle2, label: 'Asistió' },
+  CANCELLED: { color: 'from-slate-100/60 to-slate-50/30 border-slate-200/40', darkColor: 'dark:from-slate-800/60 dark:to-slate-800/40 dark:border-slate-700/40', icon: XCircle, label: 'Cancelada' },
+  NO_SHOW: { color: 'from-pastel-rose/70 to-pastel-rose/40 border-rose-200/40', darkColor: 'dark:from-rose-900/70 dark:to-rose-900/50 dark:border-rose-700/40', icon: AlertCircle, label: 'No asistió' },
 }
 
 const profColors: Record<string, string> = {
@@ -66,13 +66,13 @@ export default function SessionsPage() {
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <NeuButton variant="ghost" size="sm" icon={<ChevronLeft className="h-4 w-4" />} />
-            <span className="text-sm font-semibold text-slate-700 px-3">Abril 2026 - Semana 2</span>
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 px-3">Abril 2026 - Semana 2</span>
             <NeuButton variant="ghost" size="sm" icon={<ChevronRight className="h-4 w-4" />} />
           </div>
 
           <div className="flex items-center gap-3">
             {/* Legend */}
-            <div className="hidden lg:flex items-center gap-3 text-xs text-slate-400">
+            <div className="hidden lg:flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
               {Object.entries(statusConfig).map(([key, cfg]) => (
                 <span key={key} className="flex items-center gap-1">
                   <span className={cn('h-2.5 w-2.5 rounded-full bg-gradient-to-r', cfg.color)} />
@@ -87,19 +87,19 @@ export default function SessionsPage() {
         </div>
 
         {/* Calendar grid */}
-        <div className="rounded-3xl bg-white/80 shadow-neomorphic backdrop-blur-sm overflow-hidden">
+        <div className="rounded-3xl bg-white/80 dark:bg-slate-900/80 dark:border dark:border-white/[0.05] shadow-neomorphic backdrop-blur-sm overflow-hidden">
           {/* Days header */}
-          <div className="grid grid-cols-[70px_repeat(5,1fr)] border-b border-slate-100">
+          <div className="grid grid-cols-[70px_repeat(5,1fr)] border-b border-slate-100 dark:border-slate-800">
             <div className="p-3" />
             {daysOfWeek.map((day, i) => (
               <div key={day} className={cn(
-                'border-l border-slate-50 p-3 text-center',
-                i === 2 && 'bg-neomorphic-primary/5',
+                'border-l border-slate-50 dark:border-slate-800 p-3 text-center',
+                i === 2 && 'bg-neomorphic-primary/5 dark:bg-pink-900/10',
               )}>
-                <p className="text-xs font-medium text-slate-400">{day.split(' ')[0]}</p>
+                <p className="text-xs font-medium text-slate-400 dark:text-slate-500">{day.split(' ')[0]}</p>
                 <p className={cn(
                   'text-lg font-bold',
-                  i === 2 ? 'text-neomorphic-primary-dark' : 'text-slate-700',
+                  i === 2 ? 'text-neomorphic-primary-dark dark:text-pink-400' : 'text-slate-700 dark:text-slate-200',
                 )}>
                   {day.split(' ')[1]}
                 </p>
@@ -109,10 +109,10 @@ export default function SessionsPage() {
 
           {/* Time rows */}
           {hours.map((hour) => (
-            <div key={hour} className="grid grid-cols-[70px_repeat(5,1fr)] border-b border-slate-50/50 min-h-[60px]">
+            <div key={hour} className="grid grid-cols-[70px_repeat(5,1fr)] border-b border-slate-50/50 dark:border-slate-800/50 min-h-[60px]">
               {/* Time label */}
               <div className="flex items-start justify-end p-2 pr-3">
-                <span className="text-xs font-medium text-slate-300">{hour}</span>
+                <span className="text-xs font-medium text-slate-300 dark:text-slate-700">{hour}</span>
               </div>
 
               {/* Day cells */}
@@ -124,8 +124,8 @@ export default function SessionsPage() {
                   <div
                     key={key}
                     className={cn(
-                      'border-l border-slate-50/50 p-1 transition-colors hover:bg-slate-50/30',
-                      dayIndex === 2 && 'bg-neomorphic-primary/[0.02]',
+                      'border-l border-slate-50/50 dark:border-slate-800/50 p-1 transition-colors hover:bg-slate-50/30 dark:hover:bg-slate-800/30',
+                      dayIndex === 2 && 'bg-neomorphic-primary/[0.02] dark:bg-pink-900/[0.03]',
                     )}
                   >
                     {slotSessions.map((session) => {
@@ -140,16 +140,17 @@ export default function SessionsPage() {
                             'w-full rounded-xl border p-2 text-left transition-all',
                             'bg-gradient-to-br',
                             config.color,
+                            config.darkColor,
                             session.status === 'CANCELLED' && 'opacity-50',
                           )}
                         >
                           <div className="flex items-center gap-1.5">
                             <span className={cn('h-1.5 w-1.5 rounded-full', profColors[session.professional])} />
-                            <p className="text-xs font-semibold text-slate-700 truncate">
+                            <p className="text-xs font-semibold text-slate-700 dark:text-slate-200 truncate">
                               {session.patient}
                             </p>
                           </div>
-                          <p className="mt-0.5 text-[10px] text-slate-500 truncate">
+                          <p className="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400 truncate">
                             {session.professional} - {session.room}
                           </p>
                         </motion.button>
@@ -189,29 +190,29 @@ export default function SessionsPage() {
                 </NeuBadge>
                 <span className="text-xs text-slate-400">{selectedSession.type}</span>
               </div>
-              <h3 className="text-xl font-bold text-slate-700">{selectedSession.patient}</h3>
+              <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200">{selectedSession.patient}</h3>
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <div className="flex items-center gap-2 rounded-xl bg-neomorphic-light-shade/50 p-3">
-                <Clock className="h-4 w-4 text-slate-400" />
+              <div className="flex items-center gap-2 rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-3">
+                <Clock className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                 <div>
-                  <p className="text-xs text-slate-400">Hora</p>
-                  <p className="text-sm font-semibold text-slate-700">{selectedSession.time}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">Hora</p>
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{selectedSession.time}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 rounded-xl bg-neomorphic-light-shade/50 p-3">
-                <User className="h-4 w-4 text-slate-400" />
+              <div className="flex items-center gap-2 rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-3">
+                <User className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                 <div>
-                  <p className="text-xs text-slate-400">Profesional</p>
-                  <p className="text-sm font-semibold text-slate-700">{selectedSession.professional}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">Profesional</p>
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{selectedSession.professional}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 rounded-xl bg-neomorphic-light-shade/50 p-3">
-                <MapPin className="h-4 w-4 text-slate-400" />
+              <div className="flex items-center gap-2 rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-3">
+                <MapPin className="h-4 w-4 text-slate-400 dark:text-slate-500" />
                 <div>
-                  <p className="text-xs text-slate-400">Consultorio</p>
-                  <p className="text-sm font-semibold text-slate-700">{selectedSession.room}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">Consultorio</p>
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{selectedSession.room}</p>
                 </div>
               </div>
             </div>

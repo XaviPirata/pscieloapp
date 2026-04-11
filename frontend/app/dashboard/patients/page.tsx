@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
-  Plus, Search, Heart, Phone, Mail,
+  Plus, Search, Heart,
   MoreHorizontal, Filter, Download,
 } from 'lucide-react'
 import Header from '@/components/layout/Header'
@@ -68,10 +68,10 @@ export default function PatientsPage() {
               key={stat.label}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={cn('rounded-2xl p-4', stat.color)}
+              className={cn('rounded-2xl p-4 dark:bg-opacity-10', stat.color)}
             >
-              <p className="text-2xl font-bold text-slate-700">{stat.value}</p>
-              <p className="text-xs text-slate-500">{stat.label}</p>
+              <p className="text-2xl font-bold text-slate-700 dark:text-slate-200">{stat.value}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{stat.label}</p>
             </motion.div>
           ))}
         </div>
@@ -98,9 +98,9 @@ export default function PatientsPage() {
           variants={container}
           initial="hidden"
           animate="show"
-          className="rounded-3xl bg-white/80 shadow-neomorphic backdrop-blur-sm overflow-hidden"
+          className="rounded-3xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic backdrop-blur-sm overflow-hidden dark:border dark:border-white/[0.05]"
         >
-          <div className="grid grid-cols-12 gap-4 border-b border-slate-100 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
+          <div className="grid grid-cols-12 gap-4 border-b border-slate-100 dark:border-slate-800 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-600">
             <div className="col-span-3">Paciente</div>
             <div className="col-span-2">Profesional</div>
             <div className="col-span-1 text-center">Sesiones</div>
@@ -117,28 +117,28 @@ export default function PatientsPage() {
               whileHover={{ backgroundColor: 'rgba(245,247,252,0.5)' }}
               className={cn(
                 'grid grid-cols-12 items-center gap-4 px-6 py-3.5 cursor-pointer transition-colors',
-                i < filtered.length - 1 && 'border-b border-slate-50',
+                i < filtered.length - 1 && 'border-b border-slate-50 dark:border-slate-800/80',
               )}
             >
               <div className="col-span-3 flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-neomorphic-primary/40 to-neomorphic-secondary/40 text-sm font-bold text-slate-600">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-neomorphic-primary/40 to-neomorphic-secondary/40 text-sm font-bold text-slate-600 dark:text-slate-200">
                   {getInitials(patient.name)}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-700">{patient.name}</p>
-                  <p className="text-xs text-slate-400">{patient.email}</p>
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">{patient.name}</p>
+                  <p className="text-xs text-slate-400 dark:text-slate-500">{patient.email}</p>
                 </div>
               </div>
-              <div className="col-span-2 text-sm text-slate-600">{patient.professional}</div>
+              <div className="col-span-2 text-sm text-slate-600 dark:text-slate-300">{patient.professional}</div>
               <div className="col-span-1 text-center">
-                <span className="text-sm font-bold text-slate-600">{patient.sessions}</span>
+                <span className="text-sm font-bold text-slate-600 dark:text-slate-300">{patient.sessions}</span>
               </div>
               <div className="col-span-2">
                 <NeuBadge variant={(referralColors[patient.referral] || 'gray') as any} size="sm">
                   {patient.referral}
                 </NeuBadge>
               </div>
-              <div className="col-span-2 text-sm text-slate-500">{patient.lastSession}</div>
+              <div className="col-span-2 text-sm text-slate-500 dark:text-slate-400">{patient.lastSession}</div>
               <div className="col-span-1 flex justify-center">
                 <NeuBadge
                   variant={patient.status === 'active' ? 'green' : 'gray'}
@@ -149,7 +149,7 @@ export default function PatientsPage() {
                 </NeuBadge>
               </div>
               <div className="col-span-1 flex justify-end">
-                <button className="rounded-xl p-2 text-slate-300 hover:bg-slate-50 hover:text-slate-500 transition-colors">
+                <button className="rounded-xl p-2 text-slate-300 dark:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-500 dark:hover:text-slate-400 transition-colors">
                   <MoreHorizontal className="h-4 w-4" />
                 </button>
               </div>

@@ -7,11 +7,27 @@
     --text-primary: #2c3e50;
     --text-secondary: #5a6c7d;
     --text-light: #8b9aaf;
+
+    /* Neumorphic shadows — Light mode */
+    --shadow-neomorphic-sm: 3px 3px 7px rgba(163, 174, 208, 0.2), -3px -3px 7px rgba(255, 255, 255, 0.9);
+    --shadow-neomorphic: 5px 5px 12px rgba(163, 174, 208, 0.25), -5px -5px 12px rgba(255, 255, 255, 0.95);
+    --shadow-neomorphic-lg: 8px 8px 16px rgba(163, 174, 208, 0.3), -8px -8px 16px rgba(255, 255, 255, 1);
+    --shadow-neomorphic-inset: inset 3px 3px 7px rgba(163, 174, 208, 0.2), inset -3px -3px 7px rgba(255, 255, 255, 0.9);
   }
 
-  * {
-    @apply m-0 p-0 box-border;
+  .dark {
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-light: #64748b;
+
+    /* Dark neumorphism — deep contrast with subtle highlight */
+    --shadow-neomorphic-sm: 4px 4px 10px rgba(0, 0, 0, 0.6), -3px -3px 8px rgba(255, 255, 255, 0.025);
+    --shadow-neomorphic: 6px 6px 16px rgba(0, 0, 0, 0.65), -5px -5px 14px rgba(255, 255, 255, 0.03);
+    --shadow-neomorphic-lg: 10px 10px 24px rgba(0, 0, 0, 0.7), -8px -8px 20px rgba(255, 255, 255, 0.04);
+    --shadow-neomorphic-inset: inset 4px 4px 10px rgba(0, 0, 0, 0.6), inset -3px -3px 8px rgba(255, 255, 255, 0.025);
   }
+
+  * { @apply m-0 p-0 box-border; }
 
   html {
     scroll-behavior: smooth;
@@ -27,18 +43,20 @@
 }
 
 @layer utilities {
-  .text-text-primary { color: var(--text-primary); }
-  .text-text-secondary { color: var(--text-secondary); }
-  .text-text-light { color: var(--text-light); }
+  .text-text-primary  { color: var(--text-primary);   }
+  .text-text-secondary{ color: var(--text-secondary); }
+  .text-text-light    { color: var(--text-light);     }
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { @apply w-1.5 h-1.5; }
+::-webkit-scrollbar       { @apply w-1.5 h-1.5; }
 ::-webkit-scrollbar-track { @apply bg-transparent; }
 ::-webkit-scrollbar-thumb { @apply bg-slate-200 rounded-full hover:bg-slate-300; }
+.dark ::-webkit-scrollbar-thumb { @apply bg-slate-700 hover:bg-slate-600; }
 
 /* Selection */
-::selection { @apply bg-neomorphic-secondary/40 text-slate-800; }
+::selection      { @apply bg-neomorphic-secondary/40 text-slate-800; }
+.dark ::selection{ @apply bg-indigo-500/30 text-slate-100; }
 
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {

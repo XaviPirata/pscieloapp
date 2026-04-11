@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home, Users, Heart, Calendar, Building2,
   DollarSign, BarChart3, Settings, LogOut,
-  ChevronLeft, Sparkles, Moon, Sun,
+  ChevronLeft, Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -33,12 +33,12 @@ export default function Sidebar() {
     <motion.aside
       animate={{ width: collapsed ? 80 : 260 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="relative flex h-screen flex-col border-r border-white/30 bg-white/40 backdrop-blur-2xl"
+      className="relative flex h-screen flex-col border-r border-white/30 dark:border-slate-700/30 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl"
     >
-      {/* Ambient gradient behind sidebar */}
+      {/* Ambient gradient */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-r-3xl">
-        <div className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-neomorphic-primary/20 blur-3xl" />
-        <div className="absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-neomorphic-secondary/20 blur-3xl" />
+        <div className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-neomorphic-primary/20 dark:bg-neomorphic-primary/10 blur-3xl" />
+        <div className="absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-neomorphic-secondary/20 dark:bg-neomorphic-secondary/10 blur-3xl" />
       </div>
 
       {/* Logo */}
@@ -57,10 +57,10 @@ export default function Sidebar() {
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.15 }}
             >
-              <h1 className="text-xl font-bold text-slate-700">
+              <h1 className="text-xl font-bold text-slate-700 dark:text-slate-200">
                 Ps<span className="text-neomorphic-primary-dark">Cielo</span>
               </h1>
-              <p className="text-[10px] font-medium uppercase tracking-widest text-slate-400">
+              <p className="text-[10px] font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500">
                 Sistema de gestión
               </p>
             </motion.div>
@@ -75,8 +75,8 @@ export default function Sidebar() {
         onClick={() => setCollapsed(!collapsed)}
         className={cn(
           'absolute -right-3 top-20 z-20 flex h-6 w-6 items-center justify-center',
-          'rounded-full bg-white shadow-neomorphic-sm text-slate-400',
-          'transition-colors hover:text-slate-600',
+          'rounded-full bg-white dark:bg-slate-800 shadow-neomorphic-sm text-slate-400 dark:text-slate-500',
+          'transition-colors hover:text-slate-600 dark:hover:text-slate-300',
         )}
       >
         <motion.div animate={{ rotate: collapsed ? 180 : 0 }}>
@@ -98,11 +98,10 @@ export default function Sidebar() {
                 className={cn(
                   'group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-all duration-200',
                   isActive
-                    ? 'bg-white/80 shadow-neomorphic-sm text-slate-700'
-                    : 'text-slate-500 hover:bg-white/40 hover:text-slate-700',
+                    ? 'bg-white/80 dark:bg-slate-800/80 shadow-neomorphic-sm text-slate-700 dark:text-slate-200'
+                    : 'text-slate-500 dark:text-slate-400 hover:bg-white/40 dark:hover:bg-slate-800/40 hover:text-slate-700 dark:hover:text-slate-200',
                 )}
               >
-                {/* Active indicator */}
                 {isActive && (
                   <motion.div
                     layoutId="sidebar-active"
@@ -115,13 +114,13 @@ export default function Sidebar() {
                   className={cn(
                     'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all',
                     isActive
-                      ? 'bg-gradient-to-br from-neomorphic-primary/50 to-neomorphic-primary/30'
-                      : 'bg-transparent group-hover:bg-neomorphic-light-shade',
+                      ? 'bg-gradient-to-br from-neomorphic-primary/50 to-neomorphic-primary/30 dark:from-neomorphic-primary/30 dark:to-neomorphic-primary/20'
+                      : 'bg-transparent group-hover:bg-neomorphic-light-shade dark:group-hover:bg-slate-700/50',
                   )}
                 >
                   <item.icon className={cn(
                     'h-[18px] w-[18px] transition-colors',
-                    isActive ? 'text-slate-700' : 'text-slate-400 group-hover:text-slate-600',
+                    isActive ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300',
                   )} />
                 </div>
 
@@ -133,7 +132,7 @@ export default function Sidebar() {
                       exit={{ opacity: 0 }}
                       className={cn(
                         'text-sm font-medium whitespace-nowrap',
-                        isActive ? 'text-slate-700' : 'text-slate-500',
+                        isActive ? 'text-slate-700 dark:text-slate-200' : 'text-slate-500 dark:text-slate-400',
                       )}
                     >
                       {item.label}
@@ -147,10 +146,10 @@ export default function Sidebar() {
       </nav>
 
       {/* Bottom section */}
-      <div className="relative z-10 border-t border-white/30 px-3 pb-4 pt-3 space-y-1">
+      <div className="relative z-10 border-t border-white/30 dark:border-slate-700/30 px-3 pb-4 pt-3 space-y-1">
         {bottomItems.map((item) => (
           <Link key={item.href} href={item.href}>
-            <div className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-slate-400 transition-all hover:bg-white/40 hover:text-slate-600">
+            <div className="flex items-center gap-3 rounded-2xl px-3 py-2.5 text-slate-400 dark:text-slate-500 transition-all hover:bg-white/40 dark:hover:bg-slate-800/40 hover:text-slate-600 dark:hover:text-slate-300">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center">
                 <item.icon className="h-[18px] w-[18px]" />
               </div>
@@ -177,7 +176,7 @@ export default function Sidebar() {
             localStorage.removeItem('refresh_token')
             window.location.href = '/'
           }}
-          className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-slate-400 transition-all hover:bg-red-50/60 hover:text-red-500"
+          className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-slate-400 dark:text-slate-500 transition-all hover:bg-red-50/60 dark:hover:bg-red-900/20 hover:text-red-500"
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center">
             <LogOut className="h-[18px] w-[18px]" />

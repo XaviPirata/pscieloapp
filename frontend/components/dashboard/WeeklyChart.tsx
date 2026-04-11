@@ -26,17 +26,17 @@ export default function WeeklyChart() {
   const [metric, setMetric] = useState<'sessions' | 'revenue'>('sessions')
 
   return (
-    <div className="rounded-3xl bg-white/80 p-6 shadow-neomorphic backdrop-blur-sm">
+    <div className="rounded-3xl bg-white/80 dark:bg-slate-800/80 p-6 shadow-neomorphic backdrop-blur-sm">
       <div className="mb-6 flex items-center justify-between">
-        <h3 className="text-lg font-bold text-slate-700">Esta Semana</h3>
-        <div className="flex gap-1 rounded-xl bg-neomorphic-light-shade p-1">
+        <h3 className="text-lg font-bold text-slate-700 dark:text-slate-200">Esta Semana</h3>
+        <div className="flex gap-1 rounded-xl bg-neomorphic-light-shade dark:bg-slate-700/50 p-1">
           <button
             onClick={() => setMetric('sessions')}
             className={cn(
               'rounded-lg px-3 py-1 text-xs font-medium transition-all',
               metric === 'sessions'
-                ? 'bg-white text-slate-700 shadow-neomorphic-sm'
-                : 'text-slate-400 hover:text-slate-600',
+                ? 'bg-white dark:bg-slate-600 text-slate-700 dark:text-slate-200 shadow-neomorphic-sm'
+                : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300',
             )}
           >
             Sesiones
@@ -46,8 +46,8 @@ export default function WeeklyChart() {
             className={cn(
               'rounded-lg px-3 py-1 text-xs font-medium transition-all',
               metric === 'revenue'
-                ? 'bg-white text-slate-700 shadow-neomorphic-sm'
-                : 'text-slate-400 hover:text-slate-600',
+                ? 'bg-white dark:bg-slate-600 text-slate-700 dark:text-slate-200 shadow-neomorphic-sm'
+                : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300',
             )}
           >
             Ingresos
@@ -95,8 +95,12 @@ export default function WeeklyChart() {
                   className={cn(
                     'w-full max-w-[44px] rounded-xl transition-all duration-200 cursor-pointer',
                     activeDay === i
-                      ? 'bg-gradient-to-t from-neomorphic-primary-dark to-neomorphic-primary shadow-[0_4px_15px_rgba(255,179,204,0.5)]'
-                      : 'bg-gradient-to-t from-neomorphic-primary/60 to-neomorphic-primary/30',
+                      ? [
+                          'bg-gradient-to-t from-neomorphic-primary-dark to-neomorphic-primary',
+                          'dark:from-pink-500 dark:to-pink-400',
+                          'shadow-[0_4px_15px_rgba(255,179,204,0.5)] dark:shadow-[0_4px_20px_rgba(236,72,153,0.5)]',
+                        ].join(' ')
+                      : 'bg-gradient-to-t from-neomorphic-primary/80 to-neomorphic-primary/50 dark:from-pink-500/70 dark:to-pink-400/50',
                   )}
                 />
               </div>
@@ -104,7 +108,7 @@ export default function WeeklyChart() {
               {/* Label */}
               <span className={cn(
                 'text-xs font-medium transition-colors',
-                activeDay === i ? 'text-slate-700' : 'text-slate-400',
+                activeDay === i ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400 dark:text-slate-500',
               )}>
                 {day.label}
               </span>
@@ -115,15 +119,15 @@ export default function WeeklyChart() {
 
       {/* Summary */}
       <div className="mt-5 grid grid-cols-2 gap-3">
-        <div className="rounded-2xl bg-pastel-blue/20 p-3">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400">Total sesiones</p>
-          <p className="text-lg font-bold text-slate-700">
+        <div className="rounded-2xl bg-pastel-blue/20 dark:bg-blue-900/20 p-3">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">Total sesiones</p>
+          <p className="text-lg font-bold text-slate-700 dark:text-slate-200">
             {weekData.reduce((a, d) => a + d.sessions, 0)}
           </p>
         </div>
-        <div className="rounded-2xl bg-pastel-green/20 p-3">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400">Total ingresos</p>
-          <p className="text-lg font-bold text-slate-700">
+        <div className="rounded-2xl bg-pastel-green/20 dark:bg-green-900/20 p-3">
+          <p className="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">Total ingresos</p>
+          <p className="text-lg font-bold text-slate-700 dark:text-slate-200">
             ${(weekData.reduce((a, d) => a + d.revenue, 0) / 1000).toFixed(0)}k
           </p>
         </div>

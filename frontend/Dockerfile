@@ -31,7 +31,8 @@ RUN npm ci --omit=dev
 
 # Copy built application from builder
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
+RUN mkdir -p ./public
+COPY --from=builder /app/public/ ./public/
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001

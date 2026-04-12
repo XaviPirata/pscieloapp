@@ -55,7 +55,7 @@ export default function PatientsPage() {
     <div className="min-h-screen pb-8">
       <Header title="Pacientes" subtitle={`${patients.filter(p => p.status === 'active').length} activos`} />
 
-      <div className="px-8">
+      <div className="px-4 sm:px-6 lg:px-8">
         {/* Stats row */}
         <div className="mb-6 grid grid-cols-4 gap-4">
           {[

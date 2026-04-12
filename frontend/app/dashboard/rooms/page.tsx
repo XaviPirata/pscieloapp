@@ -8,7 +8,7 @@ export default function RoomsPage() {
   return (
     <div className="min-h-screen pb-8">
       <Header title="Consultorios" subtitle="Gestión de salas y disponibilidad" />
-      <div className="px-8">
+      <div className="px-4 sm:px-6 lg:px-8">
         <ComingSoon
           icon={<Building2 className="h-12 w-12" />}
           title="Consultorios"

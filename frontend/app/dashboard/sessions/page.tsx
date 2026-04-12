@@ -61,7 +61,7 @@ export default function SessionsPage() {
     <div className="min-h-screen pb-8">
       <Header title="Sesiones" subtitle="Semana del 7 al 11 de Abril 2026" />
 
-      <div className="px-8">
+      <div className="px-4 sm:px-6 lg:px-8">
         {/* Toolbar */}
         <div className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -87,7 +87,8 @@ export default function SessionsPage() {
         </div>
 
         {/* Calendar grid */}
-        <div className="rounded-3xl bg-white/80 dark:bg-slate-900/80 dark:border dark:border-white/[0.05] shadow-neomorphic backdrop-blur-sm overflow-hidden">
+        <div className="rounded-3xl bg-white/80 dark:bg-slate-900/80 dark:border dark:border-white/[0.05] shadow-neomorphic backdrop-blur-sm overflow-x-auto scrollbar-hide">
+        <div className="min-w-[600px]">
           {/* Days header */}
           <div className="grid grid-cols-[70px_repeat(5,1fr)] border-b border-slate-100 dark:border-slate-800">
             <div className="p-3" />
@@ -161,6 +162,7 @@ export default function SessionsPage() {
               })}
             </div>
           ))}
+        </div>{/* end min-w-[600px] */}
         </div>
       </div>
 

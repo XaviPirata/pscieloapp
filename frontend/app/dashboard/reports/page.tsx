@@ -8,7 +8,7 @@ export default function ReportsPage() {
   return (
     <div className="min-h-screen pb-8">
       <Header title="Reportes" subtitle="Analíticas e informes del centro" />
-      <div className="px-8">
+      <div className="px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

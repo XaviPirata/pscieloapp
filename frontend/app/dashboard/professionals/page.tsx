@@ -72,7 +72,7 @@ export default function ProfessionalsPage() {
     <div className="min-h-screen pb-8">
       <Header title="Profesionales" subtitle="Gestión del equipo de profesionales" />
 
-      <div className="px-8">
+      <div className="px-4 sm:px-6 lg:px-8">
         {/* Toolbar */}
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <div className="flex-1 min-w-[250px]">

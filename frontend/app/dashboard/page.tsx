@@ -30,7 +30,7 @@ export default function DashboardPage() {
     <div className="min-h-screen pb-8">
       <Header />
 
-      <div className="px-8">
+      <div className="px-4 sm:px-6 lg:px-8">
         {/* Welcome section */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}

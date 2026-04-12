@@ -39,7 +39,7 @@ export default function DashboardPage() {
           className="mb-8"
         >
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-3xl font-bold text-slate-700 dark:text-slate-200">
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-700 dark:text-slate-200">
               {getGreeting()}, {userName}
             </h1>
             <motion.div

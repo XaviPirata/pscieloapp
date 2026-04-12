@@ -88,7 +88,7 @@ export default function StatCard({
       transition={{ delay: delay / 1000, type: 'spring', stiffness: 200, damping: 20 }}
       whileHover={{ y: -5, scale: 1.02 }}
       className={cn(
-        'relative overflow-hidden rounded-3xl bg-white/80 dark:bg-slate-800/80 p-6',
+        'relative overflow-hidden rounded-2xl sm:rounded-3xl bg-white/80 dark:bg-slate-800/80 p-4 sm:p-6',
         'shadow-neomorphic backdrop-blur-sm',
         'transition-shadow duration-300',
         `hover:${colors.glow}`,
@@ -104,10 +104,10 @@ export default function StatCard({
 
       <div className="relative z-10 flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-slate-400 dark:text-slate-500">{title}</p>
-          <div className="mt-2 flex items-baseline gap-1">
+          <p className="text-xs sm:text-sm font-medium text-slate-400 dark:text-slate-500">{title}</p>
+          <div className="mt-1 sm:mt-2 flex items-baseline gap-1">
             <motion.span
-              className="text-3xl font-bold text-slate-700 dark:text-slate-200"
+              className="text-2xl sm:text-3xl font-bold text-slate-700 dark:text-slate-200"
               key={animatedValue}
             >
               {prefix}{animatedValue.toLocaleString('es-AR')}{suffix}
@@ -136,7 +136,7 @@ export default function StatCard({
         {/* Icon */}
         <div
           className={cn(
-            'flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl',
+            'flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl',
             'bg-gradient-to-br shadow-elevate-2',
             colors.icon,
           )}

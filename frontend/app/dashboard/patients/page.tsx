@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import {
   Plus, Search, Heart,
   MoreHorizontal, Filter, Download,
+  ChevronRight,
 } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import NeuButton from '@/components/neumorphism/Button'
@@ -51,16 +52,18 @@ export default function PatientsPage() {
     p.professional.toLowerCase().includes(search.toLowerCase())
   )
 
+  const activeCount = patients.filter(p => p.status === 'active').length
+
   return (
     <div className="min-h-screen pb-8">
-      <Header title="Pacientes" subtitle={`${patients.filter(p => p.status === 'active').length} activos`} />
+      <Header title="Pacientes" subtitle={`${activeCount} activos`} />
 
       <div className="px-4 sm:px-6 lg:px-8">
-        {/* Stats row */}
-        <div className="mb-6 grid grid-cols-4 gap-4">
+        {/* Stats row - 2 cols en mobile, 4 en desktop */}
+        <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           {[
             { label: 'Total', value: patients.length, color: 'bg-pastel-blue/30' },
-            { label: 'Activos', value: patients.filter(p => p.status === 'active').length, color: 'bg-pastel-green/30' },
+            { label: 'Activos', value: activeCount, color: 'bg-pastel-green/30' },
             { label: 'Nuevos este mes', value: 2, color: 'bg-pastel-purple/30' },
             { label: 'Desde Instagram', value: patients.filter(p => p.referral === 'Instagram').length, color: 'bg-pastel-rose/30' },
           ].map((stat) => (
@@ -68,17 +71,17 @@ export default function PatientsPage() {
               key={stat.label}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={cn('rounded-2xl p-4 dark:bg-opacity-10', stat.color)}
+              className={cn('rounded-2xl p-3 sm:p-4 dark:bg-opacity-10', stat.color)}
             >
-              <p className="text-2xl font-bold text-slate-700 dark:text-slate-200">{stat.value}</p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">{stat.label}</p>
+              <p className="text-xl sm:text-2xl font-bold text-slate-700 dark:text-slate-200">{stat.value}</p>
+              <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 leading-tight">{stat.label}</p>
             </motion.div>
           ))}
         </div>
 
-        {/* Toolbar */}
-        <div className="mb-4 flex items-center gap-3">
-          <div className="flex-1 max-w-md">
+        {/* Toolbar - responsive */}
+        <div className="mb-4 flex flex-col sm:flex-row gap-3">
+          <div className="flex-1">
             <NeuInput
               placeholder="Buscar pacientes..."
               icon={<Search className="h-4 w-4" />}
@@ -86,19 +89,83 @@ export default function PatientsPage() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <NeuButton variant="ghost" size="sm" icon={<Filter className="h-4 w-4" />}>Filtros</NeuButton>
-          <NeuButton variant="ghost" size="sm" icon={<Download className="h-4 w-4" />}>Exportar</NeuButton>
-          <NeuButton variant="primary" size="sm" icon={<Plus className="h-4 w-4" />} onClick={() => setShowCreate(true)}>
-            Nuevo Paciente
-          </NeuButton>
+          <div className="flex items-center gap-2">
+            <NeuButton variant="ghost" size="sm" icon={<Filter className="h-4 w-4" />}>
+              <span className="hidden sm:inline">Filtros</span>
+            </NeuButton>
+            <NeuButton variant="ghost" size="sm" icon={<Download className="h-4 w-4" />}>
+              <span className="hidden sm:inline">Exportar</span>
+            </NeuButton>
+            <NeuButton variant="primary" size="sm" icon={<Plus className="h-4 w-4" />} onClick={() => setShowCreate(true)}>
+              <span className="hidden sm:inline">Nuevo Paciente</span>
+              <span className="sm:hidden">Nuevo</span>
+            </NeuButton>
+          </div>
         </div>
 
-        {/* Table */}
+        {/* ─── MOBILE: Card list (< lg) ─── */}
         <motion.div
           variants={container}
           initial="hidden"
           animate="show"
-          className="rounded-3xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic backdrop-blur-sm overflow-hidden dark:border dark:border-white/[0.05]"
+          className="space-y-3 lg:hidden"
+        >
+          {filtered.map((patient) => (
+            <motion.div
+              key={patient.id}
+              variants={item}
+              className="rounded-2xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic-sm backdrop-blur-sm p-4 dark:border dark:border-white/[0.05]"
+            >
+              <div className="flex items-start gap-3">
+                {/* Avatar */}
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-neomorphic-primary/40 to-neomorphic-secondary/40 text-sm font-bold text-slate-600 dark:text-slate-200">
+                  {getInitials(patient.name)}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200 truncate">
+                      {patient.name}
+                    </h3>
+                    <NeuBadge
+                      variant={patient.status === 'active' ? 'green' : 'gray'}
+                      pulse={patient.status === 'active'}
+                      size="sm"
+                    >
+                      {patient.status === 'active' ? 'Activo' : 'Inactivo'}
+                    </NeuBadge>
+                  </div>
+
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+                    {patient.professional} &middot; {patient.sessions} sesiones
+                  </p>
+
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    <NeuBadge variant={(referralColors[patient.referral] || 'gray') as any} size="sm">
+                      {patient.referral}
+                    </NeuBadge>
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500">
+                      Última: {patient.lastSession}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action */}
+                <button className="shrink-0 rounded-xl p-2 text-slate-300 dark:text-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-500 transition-colors">
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* ─── DESKTOP: Table (>= lg) ─── */}
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="hidden lg:block rounded-3xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic backdrop-blur-sm overflow-hidden dark:border dark:border-white/[0.05]"
         >
           <div className="grid grid-cols-12 gap-4 border-b border-slate-100 dark:border-slate-800 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-600">
             <div className="col-span-3">Paciente</div>
@@ -161,15 +228,15 @@ export default function PatientsPage() {
       {/* Create Modal */}
       <NeuModal open={showCreate} onClose={() => setShowCreate(false)} title="Nuevo Paciente" size="lg">
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <NeuInput label="Nombre" placeholder="Nombre" variant="inset" />
             <NeuInput label="Apellido" placeholder="Apellido" variant="inset" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <NeuInput label="Email" type="email" placeholder="email@ejemplo.com" variant="inset" />
             <NeuInput label="Teléfono" placeholder="351-555-0000" variant="inset" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <NeuInput label="Fecha de Nacimiento" type="date" variant="inset" />
             <NeuInput label="Género" placeholder="Seleccionar..." variant="inset" />
           </div>

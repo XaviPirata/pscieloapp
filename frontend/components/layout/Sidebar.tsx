@@ -198,25 +198,29 @@ export default function Sidebar({ mobileOpen = false, onMobileClose, collapsed =
   return (
     <>
       {/* ─── DESKTOP SIDEBAR ─── */}
-      <motion.aside
-        animate={{ width: collapsed ? 80 : 260 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className="relative hidden lg:flex h-screen flex-col border-r border-white/30 dark:border-slate-700/30 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl shrink-0"
-      >
-        <NavContent />
-
-        {/* Collapse toggle */}
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => onCollapse?.(!collapsed)}
-          className="absolute -right-3 top-20 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-neomorphic-sm text-slate-400 transition-colors hover:text-slate-600"
+      {/* Wrapper div controls visibility — motion.aside can't use `hidden` because
+          Framer Motion sets inline display:block which overrides it */}
+      <div className="hidden lg:block shrink-0">
+        <motion.aside
+          animate={{ width: collapsed ? 80 : 260 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          className="relative flex h-screen flex-col border-r border-white/30 dark:border-slate-700/30 bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl"
         >
-          <motion.div animate={{ rotate: collapsed ? 180 : 0 }}>
-            <ChevronLeft className="h-3.5 w-3.5" />
-          </motion.div>
-        </motion.button>
-      </motion.aside>
+          <NavContent />
+
+          {/* Collapse toggle */}
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => onCollapse?.(!collapsed)}
+            className="absolute -right-3 top-20 z-20 flex h-6 w-6 items-center justify-center rounded-full bg-white dark:bg-slate-800 shadow-neomorphic-sm text-slate-400 transition-colors hover:text-slate-600"
+          >
+            <motion.div animate={{ rotate: collapsed ? 180 : 0 }}>
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </motion.div>
+          </motion.button>
+        </motion.aside>
+      </div>
 
       {/* ─── MOBILE DRAWER ─── */}
       <AnimatePresence>

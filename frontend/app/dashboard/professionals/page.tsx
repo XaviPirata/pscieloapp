@@ -74,8 +74,8 @@ export default function ProfessionalsPage() {
 
       <div className="px-4 sm:px-6 lg:px-8">
         {/* Toolbar */}
-        <div className="mb-6 flex flex-wrap items-center gap-3">
-          <div className="flex-1 min-w-[250px]">
+        <div className="mb-6 flex flex-col sm:flex-row gap-3">
+          <div className="flex-1">
             <NeuInput
               placeholder="Buscar por nombre o especialidad..."
               icon={<Search className="h-4 w-4" />}
@@ -85,8 +85,8 @@ export default function ProfessionalsPage() {
           </div>
 
           <div className="flex gap-2">
-            {/* View toggle */}
-            <div className="flex gap-1 rounded-xl bg-white/60 dark:bg-slate-900/60 p-1 shadow-neomorphic-sm">
+            {/* View toggle - hidden on mobile (always grid on mobile) */}
+            <div className="hidden lg:flex gap-1 rounded-xl bg-white/60 dark:bg-slate-900/60 p-1 shadow-neomorphic-sm">
               <button
                 onClick={() => setViewMode('grid')}
                 className={cn(
@@ -122,13 +122,16 @@ export default function ProfessionalsPage() {
           </div>
         </div>
 
-        {/* Grid View */}
-        {viewMode === 'grid' && (
+        {/* Grid View - always on mobile, toggle on desktop */}
+        {(viewMode === 'grid' || true) && (
           <motion.div
             variants={container}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3"
+            className={cn(
+              'grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 xl:grid-cols-3',
+              viewMode === 'list' && 'lg:hidden',
+            )}
           >
             {filtered.map((prof) => (
               <motion.div key={prof.id} variants={item}>
@@ -144,57 +147,59 @@ export default function ProfessionalsPage() {
                   )} />
 
                   {/* Header */}
-                  <div className="flex items-start gap-4 mb-4">
+                  <div className="flex items-start gap-3 sm:gap-4 mb-4">
                     <motion.div
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       className={cn(
-                        'flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl',
-                        'bg-gradient-to-br text-lg font-bold text-white shadow-elevate-2',
+                        'flex h-12 w-12 sm:h-14 sm:w-14 shrink-0 items-center justify-center rounded-2xl',
+                        'bg-gradient-to-br text-base sm:text-lg font-bold text-white shadow-elevate-2',
                         prof.color,
                       )}
                     >
                       {getInitials(prof.name)}
                     </motion.div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-slate-700 dark:text-slate-200">{prof.name}</h3>
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-bold text-slate-700 dark:text-slate-200 text-sm sm:text-base">{prof.name}</h3>
+                        <NeuBadge
+                          variant={prof.status === 'active' ? 'green' : 'gray'}
+                          pulse={prof.status === 'active'}
+                          size="sm"
+                        >
+                          {prof.status === 'active' ? 'Activo' : 'Inactivo'}
+                        </NeuBadge>
+                      </div>
                       <div className="mt-1 flex flex-wrap gap-1">
                         {prof.specialties.map((s) => (
                           <NeuBadge key={s} variant="blue" size="sm">{s}</NeuBadge>
                         ))}
                       </div>
                     </div>
-                    <NeuBadge
-                      variant={prof.status === 'active' ? 'green' : 'gray'}
-                      pulse={prof.status === 'active'}
-                      size="sm"
-                    >
-                      {prof.status === 'active' ? 'Activo' : 'Inactivo'}
-                    </NeuBadge>
                   </div>
 
                   {/* Stats */}
                   <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div className="rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-2.5 text-center">
-                      <p className="text-lg font-bold text-slate-700 dark:text-slate-200">{prof.sessions}</p>
-                      <p className="text-[10px] text-slate-400 dark:text-slate-500">Sesiones/mes</p>
+                    <div className="rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-2 sm:p-2.5 text-center">
+                      <p className="text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200">{prof.sessions}</p>
+                      <p className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500">Sesiones/mes</p>
                     </div>
-                    <div className="rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-2.5 text-center">
-                      <p className="text-lg font-bold text-slate-700 dark:text-slate-200">${(prof.hourlyRate / 1000).toFixed(0)}k</p>
-                      <p className="text-[10px] text-slate-400 dark:text-slate-500">Por sesión</p>
+                    <div className="rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-2 sm:p-2.5 text-center">
+                      <p className="text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200">${(prof.hourlyRate / 1000).toFixed(0)}k</p>
+                      <p className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500">Por sesión</p>
                     </div>
-                    <div className="rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-2.5 text-center">
+                    <div className="rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-2 sm:p-2.5 text-center">
                       <div className="flex items-center justify-center gap-0.5">
-                        <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                        <p className="text-lg font-bold text-slate-700 dark:text-slate-200">{prof.rating}</p>
+                        <Star className="h-3 w-3 sm:h-3.5 sm:w-3.5 fill-yellow-400 text-yellow-400" />
+                        <p className="text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200">{prof.rating}</p>
                       </div>
-                      <p className="text-[10px] text-slate-400 dark:text-slate-500">Rating</p>
+                      <p className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500">Rating</p>
                     </div>
                   </div>
 
                   {/* Contact */}
                   <div className="flex items-center gap-4 text-xs text-slate-400">
-                    <span className="flex items-center gap-1 text-slate-400 dark:text-slate-500">
-                      <Mail className="h-3 w-3" /> {prof.email}
+                    <span className="flex items-center gap-1 text-slate-400 dark:text-slate-500 truncate">
+                      <Mail className="h-3 w-3 shrink-0" /> {prof.email}
                     </span>
                   </div>
 
@@ -213,13 +218,13 @@ export default function ProfessionalsPage() {
           </motion.div>
         )}
 
-        {/* List View */}
+        {/* List View - desktop only */}
         {viewMode === 'list' && (
           <motion.div
             variants={container}
             initial="hidden"
             animate="show"
-            className="rounded-3xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic backdrop-blur-sm overflow-hidden dark:border dark:border-white/[0.05]"
+            className="hidden lg:block rounded-3xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic backdrop-blur-sm overflow-hidden dark:border dark:border-white/[0.05]"
           >
             {/* Table header */}
             <div className="grid grid-cols-12 gap-4 border-b border-slate-100 dark:border-slate-800 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-600">
@@ -292,13 +297,13 @@ export default function ProfessionalsPage() {
       {/* Create Modal */}
       <NeuModal open={showCreate} onClose={() => setShowCreate(false)} title="Nuevo Profesional" size="lg">
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <NeuInput label="Nombre" placeholder="Nombre" variant="inset" />
             <NeuInput label="Apellido" placeholder="Apellido" variant="inset" />
           </div>
           <NeuInput label="Email" type="email" placeholder="email@pscielo.com" variant="inset" />
           <NeuInput label="Teléfono" placeholder="351-555-0000" variant="inset" />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <NeuInput label="Tarifa por sesión (ARS)" type="number" placeholder="15000" variant="inset" />
             <NeuInput label="Comisión (%)" type="number" placeholder="30" variant="inset" />
           </div>

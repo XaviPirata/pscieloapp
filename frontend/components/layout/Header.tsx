@@ -24,15 +24,15 @@ export default function Header({ title, subtitle }: HeaderProps) {
   const userName = 'Admin PsCielo'
 
   return (
-    <header className="flex items-center gap-3 px-4 py-3 lg:px-8 lg:py-4">
+    <header className="flex items-center gap-2 sm:gap-3 px-4 py-3 lg:px-8 lg:py-4">
       {/* Hamburger — mobile only */}
       <motion.button
         whileTap={{ scale: 0.9 }}
         onClick={openMobileMenu}
-        className="flex lg:hidden h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-white/70 dark:bg-slate-800/70 shadow-neomorphic-sm text-slate-500 dark:text-slate-400"
+        className="flex lg:hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/70 dark:bg-slate-800/70 shadow-neomorphic-sm text-slate-500 dark:text-slate-400"
         aria-label="Abrir menú"
       >
-        <Menu className="h-5 w-5" />
+        <Menu className="h-[18px] w-[18px]" />
       </motion.button>
 
       {/* Page title */}
@@ -42,22 +42,22 @@ export default function Header({ title, subtitle }: HeaderProps) {
             key={title}
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="truncate text-xl font-bold text-slate-700 dark:text-slate-200 lg:text-2xl"
+            className="truncate text-lg sm:text-xl font-bold text-slate-700 dark:text-slate-200 lg:text-2xl"
           >
             {title}
           </motion.h2>
         )}
         {subtitle && (
-          <p className="truncate mt-0.5 text-xs text-slate-400 dark:text-slate-500 lg:text-sm">{subtitle}</p>
+          <p className="truncate mt-0.5 text-[11px] sm:text-xs text-slate-400 dark:text-slate-500 lg:text-sm">{subtitle}</p>
         )}
       </div>
 
-      {/* Right - Actions */}
-      <div className="flex items-center gap-2 lg:gap-3">
-        {/* Search — hidden on small mobile, shown from sm */}
+      {/* Right - Actions (compacto en mobile) */}
+      <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3">
+        {/* Search — hidden on mobile */}
         <motion.div
           animate={{ width: searchOpen ? 220 : 38 }}
-          className="relative hidden sm:block overflow-hidden"
+          className="relative hidden md:block overflow-hidden"
           style={{ minWidth: 38 }}
         >
           <motion.button
@@ -89,11 +89,10 @@ export default function Header({ title, subtitle }: HeaderProps) {
 
         {/* Dark mode toggle */}
         <motion.button
-          whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={toggle}
           className={cn(
-            'relative flex h-[38px] w-[38px] items-center justify-center rounded-2xl',
+            'relative flex h-8 w-8 sm:h-[38px] sm:w-[38px] items-center justify-center rounded-xl sm:rounded-2xl',
             'bg-white/70 dark:bg-slate-800/70 shadow-neomorphic-sm',
             'text-slate-400 dark:text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-yellow-400',
           )}
@@ -108,7 +107,7 @@ export default function Header({ title, subtitle }: HeaderProps) {
                 exit={{ opacity: 0, rotate: 90, scale: 0.5 }}
                 transition={{ duration: 0.2 }}
               >
-                <Sun className="h-[17px] w-[17px]" />
+                <Sun className="h-4 w-4 sm:h-[17px] sm:w-[17px]" />
               </motion.div>
             ) : (
               <motion.div
@@ -118,16 +117,15 @@ export default function Header({ title, subtitle }: HeaderProps) {
                 exit={{ opacity: 0, rotate: -90, scale: 0.5 }}
                 transition={{ duration: 0.2 }}
               >
-                <Moon className="h-[17px] w-[17px]" />
+                <Moon className="h-4 w-4 sm:h-[17px] sm:w-[17px]" />
               </motion.div>
             )}
           </AnimatePresence>
         </motion.button>
 
-        {/* Notifications */}
-        <div className="relative">
+        {/* Notifications - hidden on very small screens */}
+        <div className="relative hidden sm:block">
           <motion.button
-            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => { setNotifOpen(!notifOpen); setProfileOpen(false) }}
             className={cn(
@@ -170,23 +168,22 @@ export default function Header({ title, subtitle }: HeaderProps) {
           </AnimatePresence>
         </div>
 
-        {/* Profile */}
+        {/* Profile - compact on mobile */}
         <div className="relative">
           <motion.button
-            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => { setProfileOpen(!profileOpen); setNotifOpen(false) }}
             className={cn(
-              'flex items-center gap-2 rounded-2xl py-1.5 pl-1.5 pr-2 lg:pr-3',
+              'flex items-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl py-1 pl-1 pr-1.5 sm:py-1.5 sm:pl-1.5 sm:pr-3',
               'bg-white/70 dark:bg-slate-800/70 shadow-neomorphic-sm',
               'transition-all hover:shadow-neomorphic',
             )}
           >
-            <div className="flex h-7 w-7 lg:h-8 lg:w-8 items-center justify-center rounded-xl bg-gradient-to-br from-neomorphic-primary to-neomorphic-secondary text-xs font-bold text-white">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg sm:rounded-xl bg-gradient-to-br from-neomorphic-primary to-neomorphic-secondary text-[10px] sm:text-xs font-bold text-white">
               {getInitials(userName)}
             </div>
-            <span className="hidden sm:block text-sm font-medium text-slate-600 dark:text-slate-300">{userName}</span>
-            <ChevronDown className="hidden sm:block h-3.5 w-3.5 text-slate-400" />
+            <span className="hidden md:block text-sm font-medium text-slate-600 dark:text-slate-300">{userName}</span>
+            <ChevronDown className="hidden md:block h-3.5 w-3.5 text-slate-400" />
           </motion.button>
 
           <AnimatePresence>

@@ -201,18 +201,6 @@ export default function LoginPage() {
             </motion.button>
           </form>
 
-          {/* DEV: Skip login button (remove in production) */}
-          <div className="mt-4 border-t border-slate-100 dark:border-slate-700 pt-4">
-            <motion.button
-              type="button"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => router.push('/dashboard')}
-              className="w-full rounded-2xl border-2 border-dashed border-slate-200 py-3 text-sm font-medium text-slate-400 transition-all hover:border-neomorphic-secondary hover:text-slate-600 hover:bg-white/40"
-            >
-              Demo: Ir al Dashboard sin login
-            </motion.button>
-          </div>
         </motion.div>
 
         {/* Footer */}

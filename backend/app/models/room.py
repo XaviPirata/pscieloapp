@@ -26,6 +26,7 @@ class Room(Base, AuditMixin):
     name = Column(String(50), nullable=False, unique=True, index=True)
     description = Column(Text, nullable=True)
     capacity = Column(Float, nullable=False)  # m²
+    hourly_rate = Column(Float, nullable=False, default=0)  # ARS por hora/sesión
     amenities = Column(String(500), nullable=True)  # Whiteboard, sink, etc.
     status = Column(SQLEnum(RoomStatus), default=RoomStatus.AVAILABLE, nullable=False)
 

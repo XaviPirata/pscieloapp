@@ -1,7 +1,8 @@
 """
-Room endpoints - Rooms and Rentals CRUD
+Room endpoints - Rooms and Rentals CRUD + Schedule
 """
 
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session as DBSession
 from typing import Optional
@@ -10,9 +11,12 @@ from app.models.base import get_db
 from app.models.user import User
 from app.models.room import Room, RoomRental
 from app.models.professional import Professional
+from app.models.patient import Patient
+from app.models.session import Session, SessionStatus
 from app.schemas.room import (
     RoomCreate, RoomUpdate, RoomResponse,
     RoomRentalCreate, RoomRentalUpdate, RoomRentalResponse,
+    ScheduleSlot, DaySchedule, RoomScheduleResponse,
 )
 from app.schemas.shared import PaginatedResponse
 from app.middleware.auth import get_current_user, require_admin
@@ -86,6 +90,116 @@ async def update_room(
 
     log_action(db, current_user.id, "UPDATE", "room", room.id, new_values=update_data)
     return room
+
+
+@router.delete("/{room_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_room(
+    room_id: str,
+    db: DBSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    """Delete a room (admin only) - only if no sessions linked"""
+    room = db.query(Room).filter(Room.id == room_id).first()
+    if not room:
+        raise HTTPException(status_code=404, detail="Consultorio no encontrado")
+
+    session_count = db.query(Session).filter(Session.room_id == room_id).count()
+    if session_count > 0:
+        raise HTTPException(
+            status_code=409,
+            detail=f"No se puede eliminar: tiene {session_count} sesiones asociadas",
+        )
+
+    log_action(db, current_user.id, "DELETE", "room", room.id, old_values={"name": room.name})
+    db.delete(room)
+    db.commit()
+
+
+@router.get("/{room_id}/schedule", response_model=RoomScheduleResponse)
+async def get_room_schedule(
+    room_id: str,
+    week_start: Optional[str] = Query(None, description="YYYY-MM-DD, default=lunes actual"),
+    db: DBSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get weekly schedule for a room (Mon-Fri, 08:00-20:00)"""
+    room = db.query(Room).filter(Room.id == room_id).first()
+    if not room:
+        raise HTTPException(status_code=404, detail="Consultorio no encontrado")
+
+    # Parse week_start or default to current week's Monday
+    if week_start:
+        try:
+            start = datetime.strptime(week_start, "%Y-%m-%d")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Formato de fecha inválido, usar YYYY-MM-DD")
+        # Adjust to Monday
+        start = start - timedelta(days=start.weekday())
+    else:
+        today = datetime.utcnow()
+        start = today - timedelta(days=today.weekday())
+
+    start = start.replace(hour=0, minute=0, second=0, microsecond=0)
+    end = start + timedelta(days=5)  # Mon-Fri
+
+    # Business hours 08:00-20:00
+    business_hours = [f"{h:02d}:00" for h in range(8, 20)]
+
+    # Query sessions for this room in the week
+    sessions = (
+        db.query(Session)
+        .filter(
+            Session.room_id == room_id,
+            Session.scheduled_at >= start,
+            Session.scheduled_at < end,
+            Session.status != SessionStatus.CANCELLED,
+        )
+        .order_by(Session.scheduled_at)
+        .all()
+    )
+
+    # Build day labels
+    day_labels = ["Lun", "Mar", "Mié", "Jue", "Vie"]
+    days = []
+
+    for d in range(5):
+        day_date = start + timedelta(days=d)
+        day_sessions = [s for s in sessions if s.scheduled_at.date() == day_date.date()]
+
+        slots = []
+        for s in day_sessions:
+            # Get patient and professional names
+            patient = db.query(Patient).filter(Patient.id == s.patient_id).first()
+            prof = db.query(Professional).filter(Professional.id == s.professional_id).first()
+            prof_user = db.query(User).filter(User.id == prof.user_id).first() if prof else None
+
+            patient_name = f"{patient.first_name} {patient.last_name}" if patient else "?"
+            professional_name = f"{prof_user.first_name} {prof_user.last_name}" if prof_user else "?"
+
+            slots.append(ScheduleSlot(
+                session_id=s.id,
+                hour=s.scheduled_at.strftime("%H:%M"),
+                patient_name=patient_name,
+                professional_name=professional_name,
+                status=s.status.value,
+                session_type=s.session_type.value if s.session_type else None,
+                duration_minutes=int(s.duration_minutes),
+            ))
+
+        days.append(DaySchedule(
+            date=day_date.strftime("%Y-%m-%d"),
+            day_label=f"{day_labels[d]} {day_date.day}",
+            slots=slots,
+        ))
+
+    return RoomScheduleResponse(
+        room_id=room.id,
+        room_name=room.name,
+        week_start=start.strftime("%Y-%m-%d"),
+        week_end=(start + timedelta(days=4)).strftime("%Y-%m-%d"),
+        business_hours=business_hours,
+        days=days,
+    )
 
 
 # --- Room Rentals ---

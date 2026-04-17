@@ -353,12 +353,58 @@ function SessionDetailModal({
   onUpdated: () => void
 }) {
   const [saving, setSaving] = useState(false)
+  const [showNoShowForm, setShowNoShowForm] = useState(false)
+  const [noShowReason, setNoShowReason] = useState('')
+  const [noShowAction, setNoShowAction] = useState<'reschedule' | 'pause' | 'deactivate' | 'none'>('none')
+
+  // Reset no-show form when session changes
+  useEffect(() => {
+    setShowNoShowForm(false)
+    setNoShowReason('')
+    setNoShowAction('none')
+  }, [session?.id])
 
   const updateStatus = async (newStatus: string) => {
     if (!session) return
     setSaving(true)
     try {
       await api.put(`/sessions/${session.id}`, { status: newStatus })
+      onUpdated()
+      onClose()
+    } catch {
+      // silently fail
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleNoShow = async () => {
+    if (!session) return
+    setSaving(true)
+    try {
+      // Update session status
+      await api.put(`/sessions/${session.id}`, { status: 'NO_SHOW' })
+
+      // Record attendance with reason
+      try {
+        await api.post(`/sessions/${session.id}/attendance`, {
+          session_id: session.id,
+          attended: false,
+          no_show_reason: noShowReason.trim() || null,
+        })
+      } catch {
+        // attendance record is optional
+      }
+
+      // Handle follow-up action
+      if (noShowAction === 'deactivate' && session.patient_id) {
+        try {
+          await api.delete(`/patients/${session.patient_id}`)
+        } catch {
+          // patient deactivation is best-effort
+        }
+      }
+
       onUpdated()
       onClose()
     } catch {
@@ -425,33 +471,72 @@ function SessionDetailModal({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 pt-2">
-          {session.status === 'SCHEDULED' && (
-            <>
-              <NeuButton variant="success" size="sm" className="flex-1" icon={<CheckCircle2 className="h-4 w-4" />}
-                onClick={() => updateStatus('CONFIRMED')} loading={saving}>
-                Confirmar
+        {/* No-show form */}
+        {showNoShowForm && (
+          <div className="rounded-2xl border border-rose-200/50 dark:border-rose-900/30 bg-rose-50/50 dark:bg-rose-950/20 p-4 space-y-3">
+            <h4 className="text-sm font-semibold text-rose-700 dark:text-rose-300">Registrar inasistencia</h4>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400">Motivo de inasistencia</label>
+              <textarea
+                value={noShowReason}
+                onChange={e => setNoShowReason(e.target.value)}
+                placeholder="Ej: No contestó llamadas, avisó tarde, motivos personales..."
+                className="w-full rounded-xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic-sm px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 outline-none resize-none h-20"
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400">Acción a seguir</label>
+              <select
+                value={noShowAction}
+                onChange={e => setNoShowAction(e.target.value as typeof noShowAction)}
+                className="w-full rounded-xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic-sm px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 outline-none"
+              >
+                <option value="none">Sin acción adicional</option>
+                <option value="reschedule">Reprogramar sesión</option>
+                <option value="pause">Paciente en pausa (seguimiento)</option>
+                <option value="deactivate">Marcar paciente como inactivo</option>
+              </select>
+            </div>
+            <div className="flex gap-2 pt-1">
+              <NeuButton variant="danger" size="sm" className="flex-1" onClick={handleNoShow} loading={saving}>
+                Confirmar inasistencia
               </NeuButton>
-              <NeuButton variant="danger" size="sm" className="flex-1" icon={<XCircle className="h-4 w-4" />}
-                onClick={cancelSession} loading={saving}>
-                Cancelar
+              <NeuButton variant="ghost" size="sm" onClick={() => setShowNoShowForm(false)} disabled={saving}>
+                Volver
               </NeuButton>
-            </>
-          )}
-          {session.status === 'CONFIRMED' && (
-            <>
-              <NeuButton variant="success" size="sm" className="flex-1" icon={<CheckCircle2 className="h-4 w-4" />}
-                onClick={() => updateStatus('ATTENDED')} loading={saving}>
-                Marcar Asistencia
-              </NeuButton>
-              <NeuButton variant="danger" size="sm" icon={<AlertCircle className="h-4 w-4" />}
-                onClick={() => updateStatus('NO_SHOW')} loading={saving}>
-                No asistió
-              </NeuButton>
-            </>
-          )}
-          <NeuButton variant="ghost" size="sm" onClick={onClose}>Cerrar</NeuButton>
-        </div>
+            </div>
+          </div>
+        )}
+
+        {!showNoShowForm && (
+          <div className="flex flex-wrap gap-2 pt-2">
+            {session.status === 'SCHEDULED' && (
+              <>
+                <NeuButton variant="success" size="sm" className="flex-1" icon={<CheckCircle2 className="h-4 w-4" />}
+                  onClick={() => updateStatus('CONFIRMED')} loading={saving}>
+                  Confirmar
+                </NeuButton>
+                <NeuButton variant="danger" size="sm" className="flex-1" icon={<XCircle className="h-4 w-4" />}
+                  onClick={cancelSession} loading={saving}>
+                  Cancelar
+                </NeuButton>
+              </>
+            )}
+            {session.status === 'CONFIRMED' && (
+              <>
+                <NeuButton variant="success" size="sm" className="flex-1" icon={<CheckCircle2 className="h-4 w-4" />}
+                  onClick={() => updateStatus('ATTENDED')} loading={saving}>
+                  Marcar Asistencia
+                </NeuButton>
+                <NeuButton variant="danger" size="sm" icon={<AlertCircle className="h-4 w-4" />}
+                  onClick={() => setShowNoShowForm(true)}>
+                  No asisti��
+                </NeuButton>
+              </>
+            )}
+            <NeuButton variant="ghost" size="sm" onClick={onClose}>Cerrar</NeuButton>
+          </div>
+        )}
       </div>
     </NeuModal>
   )

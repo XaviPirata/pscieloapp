@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import {
-  Search,
-  Mail, Calendar, Loader2, AlertTriangle,
-  Edit3, DollarSign,
+  Search, Plus,
+  Mail, Loader2, AlertTriangle,
+  Edit3, DollarSign, Users,
 } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import NeuButton from '@/components/neumorphism/Button'
@@ -62,6 +62,7 @@ export default function ProfessionalsPage() {
   const [search, setSearch] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [editProf, setEditProf] = useState<Professional | null>(null)
+  const [showCreate, setShowCreate] = useState(false)
 
   const fetchProfessionals = useCallback(async () => {
     try {
@@ -108,6 +109,10 @@ export default function ProfessionalsPage() {
             />
           </div>
           <div className="flex gap-2">
+            <NeuButton variant="primary" size="sm" icon={<Plus className="h-4 w-4" />} onClick={() => setShowCreate(true)}>
+              <span className="hidden sm:inline">Nuevo Profesional</span>
+              <span className="sm:hidden">Nuevo</span>
+            </NeuButton>
             <div className="hidden lg:flex gap-1 rounded-xl bg-white/60 dark:bg-slate-900/60 p-1 shadow-neomorphic-sm">
               <button
                 onClick={() => setViewMode('grid')}
@@ -154,8 +159,11 @@ export default function ProfessionalsPage() {
         {/* Empty */}
         {!loading && !error && professionals.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <Calendar className="h-16 w-16 text-slate-300 dark:text-slate-600 mb-4" />
-            <p className="text-slate-500 dark:text-slate-400">No hay profesionales registrados</p>
+            <Users className="h-16 w-16 text-slate-300 dark:text-slate-600 mb-4" />
+            <p className="text-slate-500 dark:text-slate-400 mb-4">No hay profesionales registrados</p>
+            <NeuButton size="sm" icon={<Plus className="h-4 w-4" />} onClick={() => setShowCreate(true)}>
+              Agregar primer profesional
+            </NeuButton>
           </div>
         )}
 
@@ -215,17 +223,24 @@ export default function ProfessionalsPage() {
                     </div>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-2 gap-2 mb-4">
+                    <div className={cn('grid gap-2 mb-4', prof.commission_percentage === 0 ? 'grid-cols-1' : 'grid-cols-2')}>
                       <div className="rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-2 sm:p-2.5 text-center">
                         <p className="text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200">
                           {formatCurrency(prof.hourly_rate)}
                         </p>
                         <p className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500">Por sesión</p>
                       </div>
-                      <div className="rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-2 sm:p-2.5 text-center">
-                        <p className="text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200">{prof.commission_percentage}%</p>
-                        <p className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500">Comisión</p>
-                      </div>
+                      {prof.commission_percentage > 0 ? (
+                        <div className="rounded-xl bg-neomorphic-light-shade/50 dark:bg-slate-800/60 p-2 sm:p-2.5 text-center">
+                          <p className="text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200">{prof.commission_percentage}%</p>
+                          <p className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500">Comisión</p>
+                        </div>
+                      ) : (
+                        <div className="rounded-xl bg-amber-50/60 dark:bg-amber-950/20 p-2 sm:p-2.5 text-center">
+                          <p className="text-base sm:text-lg font-bold text-amber-600 dark:text-amber-400">Solo alquiler</p>
+                          <p className="text-[9px] sm:text-[10px] text-amber-500/70 dark:text-amber-500/50">Sin comisión</p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Contact */}
@@ -320,9 +335,128 @@ export default function ProfessionalsPage() {
         )}
       </div>
 
-      {/* Edit Modal */}
+      {/* Modals */}
+      <ProfessionalCreateModal open={showCreate} onClose={() => setShowCreate(false)} onSaved={fetchProfessionals} />
       <ProfessionalEditModal prof={editProf} onClose={() => setEditProf(null)} onSaved={fetchProfessionals} />
     </div>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CREATE MODAL — Crea usuario + perfil profesional en un paso
+   ════════════════════════════════════════════════════════════════ */
+
+function ProfessionalCreateModal({
+  open, onClose, onSaved,
+}: {
+  open: boolean
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [specialties, setSpecialties] = useState('')
+  const [hourlyRate, setHourlyRate] = useState('40000')
+  const [commission, setCommission] = useState('30')
+  const [licenseNumber, setLicenseNumber] = useState('')
+
+  useEffect(() => {
+    if (!open) return
+    setFirstName(''); setLastName(''); setEmail(''); setPhone('')
+    setSpecialties(''); setHourlyRate('40000'); setCommission('30')
+    setLicenseNumber(''); setError('')
+  }, [open])
+
+  const handleSubmit = async () => {
+    if (!firstName.trim() || !lastName.trim()) { setError('Nombre y apellido son obligatorios'); return }
+    if (!email.trim()) { setError('Email es obligatorio'); return }
+
+    setSaving(true)
+    setError('')
+
+    try {
+      await api.post('/professionals/full', {
+        first_name: firstName.trim(),
+        last_name: lastName.trim(),
+        email: email.trim(),
+        phone: phone.trim() || null,
+        license_number: licenseNumber.trim() || null,
+        specialties: specialties.split(',').map(s => s.trim()).filter(Boolean),
+        hourly_rate: parseFloat(hourlyRate) || 40000,
+        commission_percentage: parseFloat(commission) ?? 30,
+      })
+      onSaved()
+      onClose()
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { detail?: string } } }
+      setError(axiosErr?.response?.data?.detail || 'Error creando profesional')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <NeuModal open={open} onClose={onClose} title="Nuevo Profesional" size="lg">
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <NeuInput label="Nombre *" value={firstName} onChange={e => setFirstName(e.target.value)} placeholder="Nombre" />
+          <NeuInput label="Apellido *" value={lastName} onChange={e => setLastName(e.target.value)} placeholder="Apellido" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <NeuInput label="Email *" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="profesional@email.com" />
+          <NeuInput label="Teléfono" value={phone} onChange={e => setPhone(e.target.value)} placeholder="351-555-0000" />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <NeuInput
+            label="Tarifa por sesión (ARS)"
+            type="number"
+            value={hourlyRate}
+            onChange={e => setHourlyRate(e.target.value)}
+            icon={<DollarSign className="h-4 w-4" />}
+            placeholder="40000"
+          />
+          <NeuInput
+            label="Comisión (%)"
+            type="number"
+            value={commission}
+            onChange={e => setCommission(e.target.value)}
+            min="0"
+            max="100"
+            placeholder="0 = solo alquiler"
+          />
+          <NeuInput
+            label="Matrícula"
+            value={licenseNumber}
+            onChange={e => setLicenseNumber(e.target.value)}
+            placeholder="MP 12345"
+          />
+        </div>
+        <NeuInput
+          label="Especialidades (separadas por coma)"
+          value={specialties}
+          onChange={e => setSpecialties(e.target.value)}
+          placeholder="Psicología Clínica, Ansiedad, Terapia Cognitiva..."
+        />
+
+        <div className="rounded-xl bg-blue-50/60 dark:bg-blue-950/20 p-3 text-xs text-blue-600 dark:text-blue-400">
+          Se creará una cuenta de acceso con la contraseña por defecto <strong>PsCielo2026!</strong>. El profesional deberá cambiarla al ingresar.
+        </div>
+
+        {error && <p className="text-sm text-red-500">{error}</p>}
+
+        <div className="flex justify-end gap-2 pt-2">
+          <NeuButton variant="ghost" size="sm" onClick={onClose} disabled={saving}>Cancelar</NeuButton>
+          <NeuButton size="sm" onClick={handleSubmit} loading={saving} icon={<Users className="h-4 w-4" />}>
+            Crear Profesional
+          </NeuButton>
+        </div>
+      </div>
+    </NeuModal>
   )
 }
 
@@ -360,9 +494,12 @@ function ProfessionalEditModal({
     setSaving(true)
     setError('')
 
+    const commissionVal = parseFloat(commission)
+    const rateVal = parseFloat(hourlyRate)
+
     const payload: Record<string, unknown> = {
-      hourly_rate: parseFloat(hourlyRate) || prof.hourly_rate,
-      commission_percentage: parseFloat(commission) || prof.commission_percentage,
+      hourly_rate: isNaN(rateVal) ? prof.hourly_rate : rateVal,
+      commission_percentage: isNaN(commissionVal) ? prof.commission_percentage : commissionVal,
       specialties: specialties.split(',').map(s => s.trim()).filter(Boolean),
       is_active: isActive,
     }
@@ -391,7 +528,7 @@ function ProfessionalEditModal({
             icon={<DollarSign className="h-4 w-4" />}
           />
           <NeuInput
-            label="Comisión (%)"
+            label="Comisión (%) — 0 = solo alquiler"
             type="number"
             value={commission}
             onChange={e => setCommission(e.target.value)}

@@ -5,7 +5,7 @@ Room schemas - Rooms, Rentals, and Schedule
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import date, datetime
-from app.models.room import RoomStatus
+from app.models.room import RoomStatus, RentalType, TimeWindow
 
 
 class RoomCreate(BaseModel):
@@ -76,6 +76,9 @@ class RoomScheduleResponse(BaseModel):
 class RoomRentalCreate(BaseModel):
     room_id: str
     professional_id: str
+    rental_type: RentalType = RentalType.MONTHLY
+    day_of_week: Optional[int] = Field(None, ge=0, le=6)  # 0=Mon, 6=Sun
+    time_window: Optional[TimeWindow] = TimeWindow.MORNING
     month_year: str = Field(..., pattern=r"^\d{4}-\d{2}$")  # YYYY-MM
     amount: float = Field(..., gt=0)
     start_date: date
@@ -85,12 +88,18 @@ class RoomRentalCreate(BaseModel):
 class RoomRentalUpdate(BaseModel):
     amount: Optional[float] = Field(None, gt=0)
     paid: Optional[bool] = None
+    rental_type: Optional[RentalType] = None
+    day_of_week: Optional[int] = Field(None, ge=0, le=6)
+    time_window: Optional[TimeWindow] = None
 
 
 class RoomRentalResponse(BaseModel):
     id: str
     room_id: str
     professional_id: str
+    rental_type: str = "MONTHLY"
+    day_of_week: Optional[int] = None
+    time_window: Optional[str] = None
     month_year: str
     amount: float
     start_date: date

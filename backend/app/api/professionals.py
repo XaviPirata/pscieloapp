@@ -3,21 +3,39 @@ Professional endpoints - CRUD operations
 """
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
+from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy.orm import Session as DBSession
-from typing import Optional
+from typing import Optional, List
 
 from app.models.base import get_db
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.models.professional import Professional
 from app.schemas.professional import (
     ProfessionalCreate, ProfessionalUpdate,
     ProfessionalResponse, ProfessionalListResponse,
 )
 from app.schemas.shared import PaginatedResponse
-from app.middleware.auth import get_current_user, require_admin
+from app.middleware.auth import get_current_user, require_admin, hash_password
 from app.services.audit import log_action
 
 router = APIRouter()
+
+
+class ProfessionalFullCreate(BaseModel):
+    """Create user + professional in one step"""
+    # User fields
+    email: EmailStr
+    first_name: str = Field(..., min_length=1, max_length=100)
+    last_name: str = Field(..., min_length=1, max_length=100)
+    password: str = Field(default="PsCielo2026!", min_length=6)
+    phone: Optional[str] = None
+    # Professional fields
+    license_number: Optional[str] = None
+    specialties: List[str] = []
+    bio: Optional[str] = None
+    hourly_rate: float = Field(default=40000, ge=0)
+    room_rental_monthly: float = Field(default=0, ge=0)
+    commission_percentage: float = Field(default=30, ge=0, le=100)
 
 
 @router.get("", response_model=PaginatedResponse[ProfessionalListResponse])
@@ -54,6 +72,57 @@ async def list_professionals(
         page_size=page_size,
         total_pages=(total + page_size - 1) // page_size,
     )
+
+
+@router.post("/full", response_model=ProfessionalResponse, status_code=status.HTTP_201_CREATED)
+async def create_professional_full(
+    data: ProfessionalFullCreate,
+    db: DBSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    """Create a user + professional profile in one step (admin only)"""
+    # Check if email already exists
+    existing_user = db.query(User).filter(User.email == data.email).first()
+    if existing_user:
+        raise HTTPException(status_code=409, detail="Ya existe un usuario con ese email")
+
+    # Create user
+    user = User(
+        email=data.email,
+        first_name=data.first_name,
+        last_name=data.last_name,
+        password_hash=hash_password(data.password),
+        role=UserRole.PROFESSIONAL,
+        phone=data.phone,
+        is_active=True,
+        is_verified=True,
+        created_by=current_user.id,
+    )
+    db.add(user)
+    db.flush()  # Get user.id without committing
+
+    # Create professional
+    prof = Professional(
+        user_id=user.id,
+        license_number=data.license_number,
+        specialties=data.specialties,
+        bio=data.bio,
+        hourly_rate=data.hourly_rate,
+        room_rental_monthly=data.room_rental_monthly,
+        commission_percentage=data.commission_percentage,
+        created_by=current_user.id,
+    )
+    db.add(prof)
+    db.commit()
+    db.refresh(prof)
+
+    log_action(db, current_user.id, "CREATE", "professional", prof.id,
+               new_values={"email": data.email, "name": f"{data.first_name} {data.last_name}"})
+
+    response = ProfessionalResponse.model_validate(prof)
+    response.user_email = user.email
+    response.user_name = user.full_name
+    return response
 
 
 @router.get("/{professional_id}", response_model=ProfessionalResponse)

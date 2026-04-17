@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion } from 'framer-motion'
 import {
   Plus, Search, Heart,
-  Loader2, AlertTriangle, Edit3, Trash2,
+  Loader2, AlertTriangle, Edit3, Trash2, UserX,
 } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import NeuButton from '@/components/neumorphism/Button'
@@ -61,30 +61,50 @@ export default function PatientsPage() {
   const [editPatient, setEditPatient] = useState<Patient | null>(null)
   const [deletePatient, setDeletePatient] = useState<Patient | null>(null)
 
-  const fetchPatients = useCallback(async () => {
+  // Prevent duplicate fetches
+  const fetchRef = useRef(0)
+
+  const fetchPatients = useCallback(async (searchTerm: string) => {
+    const fetchId = ++fetchRef.current
     try {
       setLoading(true)
       setError(null)
       const params: Record<string, string> = { page_size: '100' }
-      if (search.trim()) params.search = search.trim()
+      if (searchTerm.trim()) params.search = searchTerm.trim()
       const res = await api.get('/patients', { params })
-      setPatients(res.data.items || [])
+      // Only apply if this is still the latest fetch
+      if (fetchId === fetchRef.current) {
+        setPatients(res.data.items || [])
+      }
     } catch {
-      setError('Error cargando pacientes')
+      if (fetchId === fetchRef.current) {
+        setError('Error cargando pacientes')
+      }
     } finally {
-      setLoading(false)
+      if (fetchId === fetchRef.current) {
+        setLoading(false)
+      }
     }
-  }, [search])
+  }, [])
 
+  // Initial load
   useEffect(() => {
-    const timeout = setTimeout(fetchPatients, search ? 300 : 0)
+    fetchPatients('')
+  }, [fetchPatients])
+
+  // Debounced search
+  useEffect(() => {
+    if (search === '') return // Initial load already handles empty search
+    const timeout = setTimeout(() => fetchPatients(search), 300)
     return () => clearTimeout(timeout)
+  }, [search, fetchPatients])
+
+  const handleRefresh = useCallback(() => {
+    fetchPatients(search)
   }, [fetchPatients, search])
 
   const activeCount = patients.filter(p => p.is_active).length
   const igCount = patients.filter(p => p.referral_source === 'Instagram').length
-
-  const filtered = patients
 
   return (
     <div className="min-h-screen pb-24 lg:pb-8">
@@ -134,7 +154,7 @@ export default function PatientsPage() {
           <div className="mb-4 flex items-center gap-2 rounded-xl bg-red-50 dark:bg-red-950/30 p-4 text-sm text-red-600 dark:text-red-400">
             <AlertTriangle className="h-4 w-4 shrink-0" />
             {error}
-            <button onClick={fetchPatients} className="ml-auto underline">Reintentar</button>
+            <button onClick={handleRefresh} className="ml-auto underline">Reintentar</button>
           </div>
         )}
 
@@ -161,14 +181,14 @@ export default function PatientsPage() {
         )}
 
         {/* ─── MOBILE: Card list (< lg) ─── */}
-        {!loading && filtered.length > 0 && (
+        {!loading && patients.length > 0 && (
           <motion.div
             variants={container}
             initial="hidden"
             animate="show"
             className="space-y-3 lg:hidden"
           >
-            {filtered.map((patient) => (
+            {patients.map((patient) => (
               <motion.div
                 key={patient.id}
                 variants={item}
@@ -220,7 +240,7 @@ export default function PatientsPage() {
         )}
 
         {/* ─── DESKTOP: Table (>= lg) ─── */}
-        {!loading && filtered.length > 0 && (
+        {!loading && patients.length > 0 && (
           <motion.div
             variants={container}
             initial="hidden"
@@ -236,14 +256,14 @@ export default function PatientsPage() {
               <div className="col-span-2"></div>
             </div>
 
-            {filtered.map((patient, i) => (
+            {patients.map((patient, i) => (
               <motion.div
                 key={patient.id}
                 variants={item}
                 whileHover={{ backgroundColor: 'rgba(245,247,252,0.5)' }}
                 className={cn(
                   'grid grid-cols-12 items-center gap-4 px-6 py-3.5 transition-colors',
-                  i < filtered.length - 1 && 'border-b border-slate-50 dark:border-slate-800/80',
+                  i < patients.length - 1 && 'border-b border-slate-50 dark:border-slate-800/80',
                 )}
               >
                 <div className="col-span-3 flex items-center gap-3">
@@ -291,9 +311,9 @@ export default function PatientsPage() {
       </div>
 
       {/* Modals */}
-      <PatientFormModal open={showCreate} onClose={() => setShowCreate(false)} onSaved={fetchPatients} />
-      <PatientFormModal open={!!editPatient} patient={editPatient ?? undefined} onClose={() => setEditPatient(null)} onSaved={fetchPatients} />
-      <DeleteConfirmModal patient={deletePatient} onClose={() => setDeletePatient(null)} onDeleted={fetchPatients} />
+      <PatientFormModal open={showCreate} onClose={() => setShowCreate(false)} onSaved={handleRefresh} />
+      <PatientFormModal open={!!editPatient} patient={editPatient ?? undefined} onClose={() => setEditPatient(null)} onSaved={handleRefresh} />
+      <DeleteConfirmModal patient={deletePatient} onClose={() => setDeletePatient(null)} onDeleted={handleRefresh} />
     </div>
   )
 }
@@ -404,7 +424,7 @@ function PatientFormModal({
 }
 
 /* ════════════════════════════════════════════════════════════════
-   DELETE CONFIRM MODAL
+   DELETE CONFIRM MODAL — Desactivar o eliminar definitivamente
    ════════════════════════════════════════════════════════════════ */
 
 function DeleteConfirmModal({
@@ -414,12 +434,18 @@ function DeleteConfirmModal({
   onClose: () => void
   onDeleted: () => void
 }) {
-  const [deleting, setDeleting] = useState(false)
+  const [processing, setProcessing] = useState(false)
   const [error, setError] = useState('')
+  const [confirmPermanent, setConfirmPermanent] = useState(false)
 
-  const handleDelete = async () => {
+  useEffect(() => {
+    setError('')
+    setConfirmPermanent(false)
+  }, [patient?.id])
+
+  const handleDeactivate = async () => {
     if (!patient) return
-    setDeleting(true)
+    setProcessing(true)
     setError('')
     try {
       await api.delete(`/patients/${patient.id}`)
@@ -429,20 +455,85 @@ function DeleteConfirmModal({
       const axiosErr = err as { response?: { data?: { detail?: string } } }
       setError(axiosErr?.response?.data?.detail || 'Error desactivando paciente')
     } finally {
-      setDeleting(false)
+      setProcessing(false)
+    }
+  }
+
+  const handlePermanentDelete = async () => {
+    if (!patient) return
+    setProcessing(true)
+    setError('')
+    try {
+      await api.delete(`/patients/${patient.id}/permanent`)
+      onDeleted()
+      onClose()
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { detail?: string } } }
+      setError(axiosErr?.response?.data?.detail || 'Error eliminando paciente')
+    } finally {
+      setProcessing(false)
     }
   }
 
   return (
-    <NeuModal open={!!patient} onClose={onClose} title="Desactivar Paciente" size="sm">
+    <NeuModal open={!!patient} onClose={onClose} title="Gestionar Paciente" size="sm">
       <div className="space-y-4">
         <p className="text-sm text-slate-600 dark:text-slate-400">
-          ¿Desactivar a <span className="font-bold">{patient?.first_name} {patient?.last_name}</span>? El paciente quedará inactivo pero no se eliminará.
+          <span className="font-bold">{patient?.first_name} {patient?.last_name}</span>
         </p>
+
+        {!confirmPermanent ? (
+          <>
+            <div className="space-y-2">
+              <NeuButton
+                variant="secondary"
+                size="sm"
+                className="w-full justify-start"
+                icon={<UserX className="h-4 w-4" />}
+                onClick={handleDeactivate}
+                loading={processing}
+              >
+                Desactivar — queda inactivo pero se conserva
+              </NeuButton>
+              <button
+                onClick={() => setConfirmPermanent(true)}
+                disabled={processing}
+                className="w-full flex items-center gap-2 rounded-xl border border-red-200 dark:border-red-900/40 bg-red-50/50 dark:bg-red-950/20 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-950/40 transition-colors text-left"
+              >
+                <Trash2 className="h-4 w-4 shrink-0" />
+                <span>Eliminar definitivamente</span>
+              </button>
+            </div>
+          </>
+        ) : (
+          <div className="rounded-xl border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/30 p-4 space-y-3">
+            <p className="text-sm font-semibold text-red-700 dark:text-red-300">
+              Esta acción es irreversible
+            </p>
+            <p className="text-xs text-red-600/80 dark:text-red-400/80">
+              Se eliminará permanentemente a <strong>{patient?.first_name} {patient?.last_name}</strong> y toda su historia clínica. Si tiene sesiones registradas, no se podrá eliminar.
+            </p>
+            <div className="flex gap-2">
+              <NeuButton
+                variant="danger"
+                size="sm"
+                className="flex-1"
+                onClick={handlePermanentDelete}
+                loading={processing}
+              >
+                Sí, eliminar
+              </NeuButton>
+              <NeuButton variant="ghost" size="sm" onClick={() => setConfirmPermanent(false)} disabled={processing}>
+                Volver
+              </NeuButton>
+            </div>
+          </div>
+        )}
+
         {error && <p className="text-sm text-red-500">{error}</p>}
-        <div className="flex justify-end gap-3">
-          <NeuButton variant="ghost" size="sm" onClick={onClose} disabled={deleting}>Cancelar</NeuButton>
-          <NeuButton variant="danger" size="sm" onClick={handleDelete} loading={deleting}>Desactivar</NeuButton>
+
+        <div className="flex justify-end">
+          <NeuButton variant="ghost" size="sm" onClick={onClose} disabled={processing}>Cancelar</NeuButton>
         </div>
       </div>
     </NeuModal>

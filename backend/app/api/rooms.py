@@ -283,3 +283,46 @@ async def update_rental(
 
     log_action(db, current_user.id, "UPDATE", "room_rental", rental.id, new_values=update_data)
     return rental
+
+
+@router.delete("/rentals/{rental_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_rental(
+    rental_id: str,
+    db: DBSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    """Delete a rental record (admin only)"""
+    rental = db.query(RoomRental).filter(RoomRental.id == rental_id).first()
+    if not rental:
+        raise HTTPException(status_code=404, detail="Alquiler no encontrado")
+
+    log_action(db, current_user.id, "DELETE", "room_rental", rental.id)
+    db.delete(rental)
+    db.commit()
+
+
+@router.get("/{room_id}/rentals", response_model=list[RoomRentalResponse])
+async def get_room_rentals(
+    room_id: str,
+    month_year: Optional[str] = None,
+    db: DBSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get all rentals for a specific room"""
+    query = db.query(RoomRental).filter(RoomRental.room_id == room_id)
+    if month_year:
+        query = query.filter(RoomRental.month_year == month_year)
+
+    rentals = query.all()
+    result = []
+    for rental in rentals:
+        data = RoomRentalResponse.model_validate(rental)
+        room = db.query(Room).filter(Room.id == rental.room_id).first()
+        prof = db.query(Professional).filter(Professional.id == rental.professional_id).first()
+        if room:
+            data.room_name = room.name
+        if prof:
+            user = db.query(User).filter(User.id == prof.user_id).first()
+            data.professional_name = user.full_name if user else None
+        result.append(data)
+    return result

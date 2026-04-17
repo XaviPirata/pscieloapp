@@ -135,6 +135,39 @@ async def delete_patient(
     return {"message": "Paciente desactivado exitosamente"}
 
 
+@router.delete("/{patient_id}/permanent", status_code=status.HTTP_204_NO_CONTENT)
+async def permanent_delete_patient(
+    patient_id: str,
+    db: DBSession = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    """Permanently delete a patient and their history (admin only)"""
+    patient = db.query(Patient).filter(Patient.id == patient_id).first()
+    if not patient:
+        raise HTTPException(status_code=404, detail="Paciente no encontrado")
+
+    # Check for existing sessions
+    from app.models.session import Session as SessionModel
+    session_count = db.query(SessionModel).filter(SessionModel.patient_id == patient_id).count()
+    if session_count > 0:
+        raise HTTPException(
+            status_code=409,
+            detail=f"No se puede eliminar: el paciente tiene {session_count} sesión(es) registrada(s). Desactívelo en su lugar."
+        )
+
+    # Delete history if exists
+    history = db.query(PatientHistory).filter(PatientHistory.patient_id == patient_id).first()
+    if history:
+        db.delete(history)
+
+    patient_name = f"{patient.first_name} {patient.last_name}"
+    log_action(db, current_user.id, "PERMANENT_DELETE", "patient", patient_id,
+               old_values={"name": patient_name, "email": patient.email})
+
+    db.delete(patient)
+    db.commit()
+
+
 # --- Patient History ---
 
 @router.get("/{patient_id}/history", response_model=PatientHistoryResponse)

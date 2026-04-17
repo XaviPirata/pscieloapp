@@ -1,9 +1,9 @@
 """
 Room model - Office spaces (consultorios)
-RoomRental - Monthly rental records
+RoomRental - Rental records (monthly or hourly)
 """
 
-from sqlalchemy import Column, String, Float, Text, Boolean, ForeignKey, Date, Enum as SQLEnum
+from sqlalchemy import Column, String, Float, Text, Boolean, ForeignKey, Date, Integer, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from enum import Enum
 import uuid
@@ -16,6 +16,19 @@ class RoomStatus(str, Enum):
     RENTED = "RENTED"
     MAINTENANCE = "MAINTENANCE"
     UNAVAILABLE = "UNAVAILABLE"
+
+
+class RentalType(str, Enum):
+    """Type of rental"""
+    MONTHLY = "MONTHLY"
+    HOURLY = "HOURLY"
+
+
+class TimeWindow(str, Enum):
+    """Time window for rental"""
+    MORNING = "MORNING"      # 08:00 - 14:00
+    AFTERNOON = "AFTERNOON"  # 14:00 - 20:00
+    FULL_DAY = "FULL_DAY"    # 08:00 - 20:00
 
 
 class Room(Base, AuditMixin):
@@ -38,12 +51,17 @@ class Room(Base, AuditMixin):
 
 
 class RoomRental(Base, AuditMixin):
-    """Room rental - Monthly fixed rental per professional"""
+    """Room rental - Monthly or hourly rental per professional"""
     __tablename__ = "room_rental"
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     room_id = Column(String(36), ForeignKey("room.id"), nullable=False, index=True)
     professional_id = Column(String(36), ForeignKey("professional.id"), nullable=False, index=True)
+
+    # Rental type and schedule
+    rental_type = Column(SQLEnum(RentalType), default=RentalType.MONTHLY, nullable=False)
+    day_of_week = Column(Integer, nullable=True)  # 0=Monday, 6=Sunday (null for all days)
+    time_window = Column(SQLEnum(TimeWindow), default=TimeWindow.MORNING, nullable=True)
 
     # Rental details
     month_year = Column(String(7), nullable=False)  # YYYY-MM

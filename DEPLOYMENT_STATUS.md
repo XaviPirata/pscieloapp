@@ -1,10 +1,10 @@
-# PsCielo - Estado de Deployment (12 de Abril 2026)
+# PsCielo - Estado de Deployment (16 de Abril 2026)
 
 ## 📍 Ubicación Actual en el Plan
 
-**Fase:** Producción - MVP Core (Paso 5 completado + Mejora Mobile en progreso)
-**Estado:** Frontend mobile completamente refactorizado, deploy en Coolify activo
-**Progreso:** 85% - Core funcional, UI mobile lista, backend listo para expansión
+**Fase:** Producción - MVP Core + Consultorios Funcionales
+**Estado:** Consultorios CRUD completo con schedule semanal, deploy en Coolify activo
+**Progreso:** 90% - Core funcional, Consultorios operativos, UI mobile-first
 
 ---
 
@@ -69,59 +69,72 @@
 - ✅ **Deployment:**
   - Commit: `b854916`
   - Push a `main` exitoso
-  - Deploy en Coolify disparado (UUID: `bp6jjf80db03b3krm1ow1yh4`)
-  - Status: **en progreso**
+  - Deploy en Coolify completado
+
+### Paso 7: Consultorios Funcionales (16 de Abril)
+
+- ✅ **Backend - Endpoints nuevos:**
+  - `GET /rooms/{id}/schedule?week_start=YYYY-MM-DD` — Horario semanal (Lun-Vie, 08:00-20:00)
+  - `DELETE /rooms/{id}` — Eliminación con validación de sesiones asociadas
+  - Schemas: ScheduleSlot, DaySchedule, RoomScheduleResponse
+  - Campo `hourly_rate` agregado al modelo Room
+
+- ✅ **Backend - Seed completo:**
+  - 4 consultorios (C1-C4) con descripción, capacidad, tarifa, amenities
+  - 4 profesionales (Andrea, Yamila, Martín, Lucía) con cuentas de usuario
+  - 7 pacientes demo
+  - 10 sesiones distribuidas Lun-Vie con estados variados
+
+- ✅ **Frontend - Página /dashboard/rooms COMPLETA:**
+  - Reemplazó "Coming Soon" con funcionalidad real
+  - 4 tarjetas StatCard: Total, Disponibles, Alquilados, Tarifa Promedio
+  - Grid de tarjetas por consultorio con estado, capacidad, tarifa, amenities
+  - Modal crear/editar consultorio (nombre, estado, descripción, capacidad, tarifa, amenities)
+  - Modal eliminar con confirmación
+  - Modal horario semanal con navegación por semana
+    - Mobile: lista por día (slot cards)
+    - Desktop: grilla horaria Lun-Vie
+  - Conectado a API real (NO datos demo)
+  - 100% mobile-first responsive
+
+- ✅ **Deployment:**
+  - Commit: `635cbd2`
+  - Push a `main` exitoso
+  - Deploy en Coolify disparado (UUID: `ajoouqn92cg14odpya82v70z`)
 
 ---
 
 ## ⏳ Pasos Pendientes Inmediatos
 
-### A) Validar Deploy Mobile en Producción
-**Estado:** EN PROGRESO (Coolify rebuilding)
-**Acción:** Esperar ~5-10 min a que terminen los builds
-**Criterio de éxito:**
-- Acceso a `https://panel.pscielo.app` OK
-- Login funciona
-- Pacientes/Sesiones/Profesionales visibles y usables en mobile
-
-### B) Testing Mobile en Navegador Real (390px)
+### A) Conectar páginas existentes al backend real
 **Estado:** PENDIENTE
-**Acción:** Verificar en Chrome DevTools o celular real
-**Checklist:**
-- [ ] No hay sidebar desktop visible
-- [ ] Bottom nav correctamente posicionada con safe-area iOS
-- [ ] Tarjetas se leen sin scroll horizontal
-- [ ] Texto NO superpuesto
+**Descripción:** Pacientes, Sesiones y Profesionales usan datos demo hardcodeados. Hay que reemplazar con llamadas a la API real (como se hizo con Consultorios).
+**Páginas a conectar:**
+- [ ] `/dashboard/patients` — usar `GET /patients`, `POST /patients`, etc.
+- [ ] `/dashboard/sessions` — usar `GET /sessions`, `POST /sessions`, etc.
+- [ ] `/dashboard/professionals` — usar `GET /professionals`, `POST /professionals`, etc.
+- [ ] `/dashboard` (home) — stats reales desde API
+
+### B) Comisiones Automáticas
+**Estado:** PENDIENTE (prerequisito: consultorios ✅)
+**Descripción:** Celery task semanal que calcula comisiones por profesional.
+
+### C) Reportes y Analytics
+**Estado:** PENDIENTE
+**Descripción:** Dashboard con KPIs, gráficos, exportación PDF.
 
 ---
 
-## 🚧 Roadmap Fase 2-3: Consultorios, Comisiones, Reportes
+## 🚧 Roadmap Fase 2-3: Comisiones, Reportes, Integraciones
 
 ### Timeline Realista (basado en arquitectura actual)
 
-#### Semana 1-2: **Consultorios (Rooms) - Backend + Frontend Básico**
-**Por qué es importante:** Sin esto no podés gestionar dónde se dan las sesiones. Es prerequisito para comisiones.
+#### ✅ COMPLETADO: **Consultorios (Rooms)**
+- Backend: CRUD + schedule semanal + delete con validación
+- Frontend: Tarjetas, modals crear/editar/eliminar, horario semanal mobile+desktop
+- Seed: 4 consultorios con datos completos
 
-Tareas:
-1. **Backend APIs (2-3 días):**
-   - `POST /rooms` - crear consultorio
-   - `GET /rooms` - listar con disponibilidad
-   - `PUT /rooms/{id}` - editar
-   - `GET /rooms/{id}/occupancy` - ver horas ocupadas esta semana
-   - Modelo: name, capacity, hourly_rate (para rentas fijas)
-
-2. **Frontend (2-3 días):**
-   - Página `/dashboard/rooms` - grid de tarjetas con nombre, horarios
-   - Modal crear/editar consultorio
-   - Integrar en selector al crear sesión
-
-3. **Tests:** +80% coverage en APIs room
-
-**Salida:** Página funcional de Consultorios (reemplaza el "Coming Soon")
-
----
-
-#### Semana 3-4: **Comisiones Automáticas - Celery + Dashboard**
+#### Próximo: **Comisiones Automáticas - Celery + Dashboard**
 **Por qué es importante:** Es donde se genera el dinero. Debe ser automático, auditado, preciso.
 
 Tareas:
@@ -315,9 +328,10 @@ Tareas:
 
 ### MVP + Financiero (Mayo 2026)
 - ✅ Todo lo anterior
-- ✅ Consultorios
-- ✅ Comisiones automáticas
-- ✅ Reportes básicos
+- ✅ Consultorios (COMPLETADO 16 Abril)
+- ⏳ Conectar Pacientes/Sesiones/Profesionales a API real
+- ⏳ Comisiones automáticas
+- ⏳ Reportes básicos
 - ❌ Integraciones
 
 ### Full Stack (Junio 2026)
@@ -340,8 +354,8 @@ Tareas:
 | **Celery Worker** | Running | internal |
 | **Traefik Proxy** | Running | 89.116.214.228:80/443 |
 
-**Deployment UUID:** `bp6jjf80db03b3krm1ow1yh4`
-**Expected Uptime:** ~5-10 min (builds en progreso)
+**Último Deployment UUID:** `ajoouqn92cg14odpya82v70z` (16 Abril 2026)
+**Commit:** `635cbd2` — Consultorios funcionales
 
 ---
 
@@ -353,8 +367,8 @@ El usuario hizo una crítica muy válida: 2026, ¿por qué no es mobile-first? A
 ### Framer Motion + Tailwind Pitfall
 `motion.div` y `motion.aside` sobrescriben `display:none` con inline `display: block`. Workaround: wrapper `<div className="hidden ...">` que no usa motion.
 
-### Backend Ready pero No Usado
-FastAPI está 100% implementado con modelos, pero el frontend NO hace llamadas reales (USA DATOS DEMO). Próximo step: conectar fetch calls con backend real.
+### Backend Parcialmente Conectado
+Consultorios ya usa la API real. Pacientes, Sesiones y Profesionales TODAVÍA usan datos demo hardcodeados. Próximo step: conectar esas 3 páginas al backend.
 
 ### Coolify Deploy Automático
 Cada push a `main` → Coolify detecta → git pull + rebuild + restart. CERO downtime porque docker-compose hace rolling restart.
@@ -377,5 +391,5 @@ curl https://api.pscielo.app/health
 
 ---
 
-*Último update: 12 de Abril 2026 - 18:00 UTC*
-*Estado: MVP Mobile-First completo, Deploy en progreso, Roadmap claro para Fases 2-4*
+*Último update: 16 de Abril 2026*
+*Estado: Consultorios funcionales + CRUD real. Próximo: conectar Pacientes/Sesiones/Profesionales a API + Comisiones*

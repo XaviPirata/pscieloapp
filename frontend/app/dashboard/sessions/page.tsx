@@ -147,7 +147,7 @@ export default function SessionsPage() {
         <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-2">
             <NeuButton variant="ghost" size="sm" icon={<ChevronLeft className="h-4 w-4" />} onClick={prevWeek} />
-            <button onClick={goToday} className="text-xs text-blue-600 dark:text-blue-400 underline px-1">Hoy</button>
+            <NeuButton variant="ghost" size="sm" onClick={goToday}>Hoy</NeuButton>
             <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 px-1">
               {weekLabel}
             </span>

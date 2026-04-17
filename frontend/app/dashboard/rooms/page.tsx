@@ -395,7 +395,7 @@ export default function RoomsPage() {
                 <button onClick={prevMonth} className="rounded-lg p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                   <ChevronLeft className="h-4 w-4 text-slate-500" />
                 </button>
-                <button onClick={goCurrentMonth} className="text-xs text-blue-600 dark:text-blue-400 underline px-1">Hoy</button>
+                <NeuButton variant="ghost" size="sm" onClick={goCurrentMonth}>Hoy</NeuButton>
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 min-w-[140px] text-center capitalize">
                   {getMonthLabel(calendarMonth)}
                 </span>
@@ -998,7 +998,7 @@ function ScheduleModal({
             <ChevronLeft className="h-4 w-4 text-slate-500" />
           </button>
           <div className="text-center">
-            <button onClick={goToday} className="text-xs text-blue-600 dark:text-blue-400 underline mb-1">Hoy</button>
+            <NeuButton variant="ghost" size="sm" onClick={goToday}>Hoy</NeuButton>
             <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
               {schedule ? `${schedule.week_start} — ${schedule.week_end}` : formatDateISO(weekStart)}
             </p>

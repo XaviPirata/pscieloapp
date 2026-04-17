@@ -362,19 +362,21 @@ function PatientFormModal({
 
   const handleSubmit = async () => {
     if (!firstName.trim() || !lastName.trim()) { setError('Nombre y apellido son obligatorios'); return }
+    if (saving) return // Prevent double submit
     setSaving(true)
     setError('')
 
     const payload: Record<string, unknown> = {
       first_name: firstName.trim(),
       last_name: lastName.trim(),
-      email: email.trim() || null,
-      phone: phone.trim() || null,
-      date_of_birth: dob || null,
-      gender: gender.trim() || null,
-      referral_source: referral.trim() || null,
-      notes: notes.trim() || null,
     }
+    // Only include optional fields if they have values
+    if (email.trim()) payload.email = email.trim()
+    if (phone.trim()) payload.phone = phone.trim()
+    if (dob) payload.date_of_birth = dob
+    if (gender.trim()) payload.gender = gender.trim()
+    if (referral.trim()) payload.referral_source = referral.trim()
+    if (notes.trim()) payload.notes = notes.trim()
 
     try {
       if (isEdit && patient) {
@@ -382,8 +384,10 @@ function PatientFormModal({
       } else {
         await api.post('/patients', payload)
       }
-      onSaved()
+      // Close first, then refresh to avoid state conflicts
       onClose()
+      // Small delay to let modal animation finish before refreshing
+      setTimeout(() => onSaved(), 150)
     } catch (err: unknown) {
       const axiosErr = err as { response?: { data?: { detail?: string } } }
       setError(axiosErr?.response?.data?.detail || 'Error guardando paciente')

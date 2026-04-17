@@ -144,6 +144,7 @@ export default function ReportsPage() {
           <div className="flex items-center gap-2 rounded-xl bg-red-50 dark:bg-red-950/30 p-4 text-sm text-red-600 dark:text-red-400">
             <AlertTriangle className="h-4 w-4 shrink-0" />
             {error}
+            <button onClick={() => window.location.reload()} className="ml-auto underline">Reintentar</button>
           </div>
         )}
 

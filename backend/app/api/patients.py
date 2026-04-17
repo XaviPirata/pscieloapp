@@ -23,7 +23,7 @@ router = APIRouter()
 @router.get("", response_model=PaginatedResponse[PatientListResponse])
 async def list_patients(
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
+    page_size: int = Query(20, ge=1, le=500),
     is_active: Optional[bool] = None,
     search: Optional[str] = None,
     db: DBSession = Depends(get_db),

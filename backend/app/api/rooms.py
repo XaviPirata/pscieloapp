@@ -207,7 +207,7 @@ async def get_room_schedule(
 @router.get("/rentals/all", response_model=PaginatedResponse[RoomRentalResponse])
 async def list_rentals(
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
+    page_size: int = Query(20, ge=1, le=500),
     month_year: Optional[str] = None,
     paid: Optional[bool] = None,
     db: DBSession = Depends(get_db),

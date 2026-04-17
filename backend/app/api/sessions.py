@@ -43,7 +43,7 @@ def _enrich_session(session: Session, db: DBSession) -> dict:
 @router.get("", response_model=PaginatedResponse[SessionListResponse])
 async def list_sessions(
     page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
+    page_size: int = Query(20, ge=1, le=500),
     professional_id: Optional[str] = None,
     patient_id: Optional[str] = None,
     session_status: Optional[SessionStatus] = None,

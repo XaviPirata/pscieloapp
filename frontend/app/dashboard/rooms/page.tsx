@@ -164,6 +164,7 @@ export default function RoomsPage() {
   const [editRoom, setEditRoom] = useState<Room | null>(null)
   const [deleteRoom, setDeleteRoom] = useState<Room | null>(null)
   const [scheduleRoom, setScheduleRoom] = useState<Room | null>(null)
+  const [showCreateRental, setShowCreateRental] = useState(false)
 
   const fetchData = useCallback(async () => {
     try {
@@ -239,14 +240,25 @@ export default function RoomsPage() {
           <h2 className="text-lg font-bold text-slate-700 dark:text-slate-200">
             {rooms.length} Consultorio{rooms.length !== 1 ? 's' : ''}
           </h2>
-          <NeuButton
-            size="sm"
-            icon={<Plus className="h-4 w-4" />}
-            onClick={() => setShowCreate(true)}
-          >
-            <span className="hidden sm:inline">Nuevo Consultorio</span>
-            <span className="sm:hidden">Nuevo</span>
-          </NeuButton>
+          <div className="flex items-center gap-2">
+            <NeuButton
+              variant="secondary"
+              size="sm"
+              icon={<DollarSign className="h-4 w-4" />}
+              onClick={() => setShowCreateRental(true)}
+            >
+              <span className="hidden sm:inline">Nuevo Alquiler</span>
+              <span className="sm:hidden">Alquiler</span>
+            </NeuButton>
+            <NeuButton
+              size="sm"
+              icon={<Plus className="h-4 w-4" />}
+              onClick={() => setShowCreate(true)}
+            >
+              <span className="hidden sm:inline">Nuevo Consultorio</span>
+              <span className="sm:hidden">Nuevo</span>
+            </NeuButton>
+          </div>
         </div>
 
         {/* ─── Error ─── */}
@@ -551,6 +563,12 @@ export default function RoomsPage() {
         room={scheduleRoom}
         onClose={() => setScheduleRoom(null)}
       />
+      <CreateRentalModal
+        open={showCreateRental}
+        rooms={rooms}
+        onClose={() => setShowCreateRental(false)}
+        onSaved={fetchData}
+      />
     </div>
   )
 }
@@ -775,6 +793,154 @@ function DeleteConfirmModal({
         <div className="flex justify-end gap-3">
           <NeuButton variant="ghost" size="sm" onClick={onClose} disabled={deleting}>Cancelar</NeuButton>
           <NeuButton variant="danger" size="sm" onClick={handleDelete} loading={deleting}>Eliminar</NeuButton>
+        </div>
+      </div>
+    </NeuModal>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════
+   SCHEDULE MODAL — Vista semanal del consultorio
+   ════════════════════════════════════════════════════════════════ */
+
+function CreateRentalModal({
+  open,
+  rooms,
+  onClose,
+  onSaved,
+}: {
+  open: boolean
+  rooms: Room[]
+  onClose: () => void
+  onSaved: () => void
+}) {
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+  const [professionals, setProfessionals] = useState<{ id: string; label: string }[]>([])
+
+  const [roomId, setRoomId] = useState('')
+  const [professionalId, setProfessionalId] = useState('')
+  const [rentalType, setRentalType] = useState('MONTHLY')
+  const [dayOfWeek, setDayOfWeek] = useState('')
+  const [timeWindow, setTimeWindow] = useState('MORNING')
+  const [amount, setAmount] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+
+  useEffect(() => {
+    if (!open) return
+    const fetchProfs = async () => {
+      try {
+        const res = await api.get('/professionals', { params: { page_size: '50' } })
+        setProfessionals((res.data.items || []).map((p: any) => ({
+          id: p.id,
+          label: p.user_name || p.user_email || p.id,
+        })))
+      } catch { /* ignore */ }
+    }
+    fetchProfs()
+    setRoomId(''); setProfessionalId(''); setRentalType('MONTHLY')
+    setDayOfWeek(''); setTimeWindow('MORNING'); setAmount('')
+    setStartDate(''); setEndDate(''); setError('')
+  }, [open])
+
+  const handleSubmit = async () => {
+    if (!roomId || !professionalId || !amount || !startDate || !endDate) {
+      setError('Completar consultorio, profesional, monto, fecha inicio y fin')
+      return
+    }
+
+    setSaving(true)
+    setError('')
+
+    // Derive month_year from startDate
+    const monthYear = startDate.substring(0, 7) // YYYY-MM
+
+    try {
+      await api.post('/rooms/rentals', {
+        room_id: roomId,
+        professional_id: professionalId,
+        rental_type: rentalType,
+        day_of_week: dayOfWeek !== '' ? parseInt(dayOfWeek) : null,
+        time_window: timeWindow || null,
+        month_year: monthYear,
+        amount: parseFloat(amount),
+        start_date: startDate,
+        end_date: endDate,
+      })
+      onSaved()
+      onClose()
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { detail?: string } } }
+      setError(axiosErr?.response?.data?.detail || 'Error creando alquiler')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <NeuModal open={open} onClose={onClose} title="Nuevo Alquiler" size="lg">
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">Consultorio *</label>
+            <select value={roomId} onChange={e => setRoomId(e.target.value)}
+              className="w-full rounded-xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic-sm px-4 py-3 text-slate-700 dark:text-slate-200 outline-none">
+              <option value="">Seleccionar...</option>
+              {rooms.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">Profesional *</label>
+            <select value={professionalId} onChange={e => setProfessionalId(e.target.value)}
+              className="w-full rounded-xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic-sm px-4 py-3 text-slate-700 dark:text-slate-200 outline-none">
+              <option value="">Seleccionar...</option>
+              {professionals.map(p => <option key={p.id} value={p.id}>{p.label}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">Tipo</label>
+            <select value={rentalType} onChange={e => setRentalType(e.target.value)}
+              className="w-full rounded-xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic-sm px-4 py-3 text-slate-700 dark:text-slate-200 outline-none">
+              <option value="MONTHLY">Mensual</option>
+              <option value="HOURLY">Por hora</option>
+            </select>
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">Día de la semana</label>
+            <select value={dayOfWeek} onChange={e => setDayOfWeek(e.target.value)}
+              className="w-full rounded-xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic-sm px-4 py-3 text-slate-700 dark:text-slate-200 outline-none">
+              <option value="">Todos los días</option>
+              {dayLabels.map((d, i) => <option key={i} value={String(i)}>{d}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-600 dark:text-slate-400">Franja horaria</label>
+            <select value={timeWindow} onChange={e => setTimeWindow(e.target.value)}
+              className="w-full rounded-xl bg-white/80 dark:bg-slate-900/80 shadow-neomorphic-sm px-4 py-3 text-slate-700 dark:text-slate-200 outline-none">
+              <option value="MORNING">Mañana (08-14)</option>
+              <option value="AFTERNOON">Tarde (14-20)</option>
+              <option value="FULL_DAY">Día completo</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <NeuInput label="Monto (ARS) *" type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="50000" icon={<DollarSign className="h-4 w-4" />} />
+          <NeuInput label="Fecha inicio *" type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+          <NeuInput label="Fecha fin *" type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
+        </div>
+
+        {error && <p className="text-sm text-red-500">{error}</p>}
+
+        <div className="flex justify-end gap-2 pt-2">
+          <NeuButton variant="ghost" size="sm" onClick={onClose} disabled={saving}>Cancelar</NeuButton>
+          <NeuButton size="sm" onClick={handleSubmit} loading={saving} icon={<DollarSign className="h-4 w-4" />}>
+            Crear Alquiler
+          </NeuButton>
         </div>
       </div>
     </NeuModal>

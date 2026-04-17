@@ -66,19 +66,20 @@ export default function DashboardPage() {
       }
     }
 
-    // Try to get user name from token
-    try {
-      const token = localStorage.getItem('access_token')
-      if (token) {
-        const payload = JSON.parse(atob(token.split('.')[1]))
-        if (payload.first_name) setUserName(payload.first_name)
-        else if (payload.sub) setUserName(payload.sub.split('@')[0])
+    // Fetch actual user name from API
+    const fetchUser = async () => {
+      try {
+        const res = await api.get('/auth/me')
+        if (res.data?.first_name) {
+          setUserName(res.data.first_name)
+        }
+      } catch {
+        // fallback: keep default 'Admin'
       }
-    } catch {
-      // ignore
     }
 
     fetchStats()
+    fetchUser()
   }, [])
 
   return (

@@ -2,9 +2,9 @@
 
 ## 📍 Ubicación Actual en el Plan
 
-**Fase:** Producción - MVP Core + Consultorios Funcionales
-**Estado:** Consultorios CRUD completo con schedule semanal, deploy en Coolify activo
-**Progreso:** 90% - Core funcional, Consultorios operativos, UI mobile-first
+**Fase:** Producción - MVP Core 100% Funcional
+**Estado:** TODAS las páginas conectadas a API real. CERO datos demo. Deploy en Coolify activo.
+**Progreso:** 95% - Core completo, todas las secciones funcionales, mobile-first
 
 ---
 
@@ -106,18 +106,19 @@
 
 ## ⏳ Pasos Pendientes Inmediatos
 
-### A) Conectar páginas existentes al backend real
-**Estado:** PENDIENTE
-**Descripción:** Pacientes, Sesiones y Profesionales usan datos demo hardcodeados. Hay que reemplazar con llamadas a la API real (como se hizo con Consultorios).
-**Páginas a conectar:**
-- [ ] `/dashboard/patients` — usar `GET /patients`, `POST /patients`, etc.
-- [ ] `/dashboard/sessions` — usar `GET /sessions`, `POST /sessions`, etc.
-- [ ] `/dashboard/professionals` — usar `GET /professionals`, `POST /professionals`, etc.
-- [ ] `/dashboard` (home) — stats reales desde API
+### ✅ A) Conectar páginas existentes al backend real — COMPLETADO (16 Abril)
+**Commit:** `eeb5017`
+**Deploy:** Coolify UUID `lqr5jkijdiuqhuuyrg10tbce`
+**Páginas conectadas:**
+- [x] `/dashboard/patients` — CRUD completo, search, stats reales
+- [x] `/dashboard/sessions` — Calendario semanal real, crear/confirmar/cancelar/asistencia
+- [x] `/dashboard/professionals` — Lista + edición tarifa/comisión/especialidades
+- [x] `/dashboard` (home) — Stats reales, WeeklyChart, UpcomingSessions desde API
+- **CERO datos demo en todo el frontend**
 
 ### B) Comisiones Automáticas
-**Estado:** PENDIENTE (prerequisito: consultorios ✅)
-**Descripción:** Celery task semanal que calcula comisiones por profesional.
+**Estado:** PENDIENTE — Próximo paso
+**Descripción:** Celery task semanal que calcula comisiones por profesional. Backend ya tiene modelo y estructura.
 
 ### C) Reportes y Analytics
 **Estado:** PENDIENTE
@@ -329,7 +330,7 @@ Tareas:
 ### MVP + Financiero (Mayo 2026)
 - ✅ Todo lo anterior
 - ✅ Consultorios (COMPLETADO 16 Abril)
-- ⏳ Conectar Pacientes/Sesiones/Profesionales a API real
+- ✅ Pacientes/Sesiones/Profesionales conectados a API (COMPLETADO 16 Abril)
 - ⏳ Comisiones automáticas
 - ⏳ Reportes básicos
 - ❌ Integraciones
@@ -354,8 +355,8 @@ Tareas:
 | **Celery Worker** | Running | internal |
 | **Traefik Proxy** | Running | 89.116.214.228:80/443 |
 
-**Último Deployment UUID:** `ajoouqn92cg14odpya82v70z` (16 Abril 2026)
-**Commit:** `635cbd2` — Consultorios funcionales
+**Último Deployment UUID:** `lqr5jkijdiuqhuuyrg10tbce` (16 Abril 2026)
+**Commit:** `eeb5017` — Todas las páginas conectadas a API real
 
 ---
 
@@ -367,8 +368,8 @@ El usuario hizo una crítica muy válida: 2026, ¿por qué no es mobile-first? A
 ### Framer Motion + Tailwind Pitfall
 `motion.div` y `motion.aside` sobrescriben `display:none` con inline `display: block`. Workaround: wrapper `<div className="hidden ...">` que no usa motion.
 
-### Backend Parcialmente Conectado
-Consultorios ya usa la API real. Pacientes, Sesiones y Profesionales TODAVÍA usan datos demo hardcodeados. Próximo step: conectar esas 3 páginas al backend.
+### Frontend 100% Conectado al Backend
+TODAS las páginas usan la API real. CERO datos demo hardcodeados. Cualquier dato que se vea en la app viene del backend PostgreSQL.
 
 ### Coolify Deploy Automático
 Cada push a `main` → Coolify detecta → git pull + rebuild + restart. CERO downtime porque docker-compose hace rolling restart.
@@ -391,5 +392,5 @@ curl https://api.pscielo.app/health
 
 ---
 
-*Último update: 16 de Abril 2026*
-*Estado: Consultorios funcionales + CRUD real. Próximo: conectar Pacientes/Sesiones/Profesionales a API + Comisiones*
+*Último update: 16 de Abril 2026 - 2do deploy*
+*Estado: MVP 100% funcional. TODAS las páginas conectadas a API real. Próximo: Comisiones automáticas + Reportes*
